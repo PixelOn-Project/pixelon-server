@@ -1,0 +1,8 @@
+# build files
+static
+venv
+
+# Binaries
+bin/
+*.dll
+*.exe
