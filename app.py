@@ -147,7 +147,7 @@ def worker_loop():
         # [RESIZE] 사용자 요청 크기 파악 (정사각형 고정)
         try:
             req_size = int(spec.get('width', 512))
-            if req_size < 64: req_size = 64 # 최소 크기 안전장치
+            if req_size < 2: req_size = 2 # 최소 크기 안전장치
         except:
             req_size = 512
 
