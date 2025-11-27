@@ -1,6 +1,8 @@
 # build files
 static
 venv
+dist
+build
 
 # Binaries
 bin/
