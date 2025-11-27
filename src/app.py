@@ -39,7 +39,7 @@ SERVER_URL = f"http://{HOST}:{PORT}"
 HEARTBEAT_TIMEOUT = 5  # 5초 동안 신호 없으면 종료
 STARTUP_GRACE_PERIOD = 10 # 서버 시작 후 10초간은 종료 안 함
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app) # CORS 허용 (로컬 파일 접근 문제 해결)
 
 # ========================================================
