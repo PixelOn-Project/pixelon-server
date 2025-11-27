@@ -18,6 +18,11 @@ TARGETS = {
 }
 BASE_URL = f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{VERSION_TAG}/"
 DEST_DIR = "bin"
+MODEL_DIR = "models"
+
+MODELS = {
+    "sd_v-1-5.safetensors": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors",
+}
 
 def download_and_extract(url, extract_to):
     print(f">> [DOWNLOAD] Fetching {url}...")
@@ -35,6 +40,42 @@ def download_and_extract(url, extract_to):
         print(f">> [ERROR] Exception occurred: {e}")
         return 0
 
+def download_file(url, dest, name):
+    """
+    url: 다운로드할 파일의 URL
+    dest: 저장할 폴더 경로 (예: 'bin/models')
+    name: 저장할 파일 이름 (예: 'sd_v1-5.safetensors')
+    """
+    print(f">> [DOWNLOAD] Fetching {url}...")
+    
+    # 1. 전체 저장 경로 생성 (폴더 + 파일명)
+    save_to = os.path.join(dest, name)
+    print(f">> [INFO] Target Path: {save_to}")
+
+    # 2. 저장할 폴더가 없으면 생성
+    if dest:
+        os.makedirs(dest, exist_ok=True)
+
+    try:
+        # 3. 요청 보내기 (stream=True: 대용량 파일 메모리 최적화)
+        with requests.get(url, stream=True) as response:
+            if response.status_code == 200:
+                # 4. 파일 저장 (wb: Write Binary 모드)
+                with open(save_to, 'wb') as f:
+                    # 8KB씩 조각내어 파일에 쓰기
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+                
+                print(f">> [OK] Download complete: {save_to}")
+                return 1
+            else:
+                print(f">> [ERROR] Failed to download. Status: {response.status_code}")
+                return 0
+                
+    except Exception as e:
+        print(f">> [ERROR] Exception occurred: {e}")
+        return 0
 def main():
     # 1. 기존 bin 폴더 초기화
     if os.path.exists(DEST_DIR):
@@ -74,6 +115,13 @@ def main():
 
         # 최종 출력 리스트에서 cuda_dll 제거 (보기 좋게)
         structure = [s for s in structure if "cuda_dll" not in s]
+
+    # 모델 다운로드
+    for model_name, model_url in MODELS.items():
+        model_dest = os.path.join(MODEL_DIR)
+        os.makedirs(model_dest, exist_ok=True)
+        if download_file(model_url, model_dest, model_name):
+            structure.append(f'{model_dest}/{model_name}')
 
     print("\n>> [SYSTEM] Binary fetch complete.")
     print(f"   Structure: {', '.join(structure)}")

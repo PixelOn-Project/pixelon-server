@@ -19,8 +19,9 @@ if %errorlevel% neq 0 (
 git submodule update --init --recursive
 
 cd piskel
-call npm install
-
+git pull origin dev
+git checkout dev
+call npm instal
 call %BUILD_CMD% build
 
 cd ../
@@ -31,4 +32,3 @@ call python -m venv venv
 call ./venv/Scripts/activate
 call pip install -r requirements.txt
 call python fetch_binaries.py
-call deactivate

@@ -6,3 +6,8 @@ venv
 bin/
 *.dll
 *.exe
+models
+
+# Temp files
+results/*
+test_output
