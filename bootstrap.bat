@@ -31,4 +31,4 @@ xcopy /E /Y /I "piskel\dest\*" "static\editor\"
 call python -m venv venv
 call ./venv/Scripts/activate
 call pip install -r requirements.txt
-call python fetch_binaries.py
+call python ./src/fetch_binaries.py

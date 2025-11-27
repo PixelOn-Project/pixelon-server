@@ -11,6 +11,7 @@ bin/
 models
 
 # Temp files
+__pycache__
 results/*
 test_output
 *.spec

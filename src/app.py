@@ -208,6 +208,13 @@ def worker_loop():
                     '--threads', '8'
                 ]
 
+                startupinfo = None
+                creationflags = 0
+                if sys.platform == 'win32':
+                    startupinfo = subprocess.STARTUPINFO()
+                    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                    creationflags = subprocess.CREATE_NO_WINDOW
+
                 process = subprocess.Popen(
                     cmd,
                     cwd=BASE_DIR,
@@ -215,7 +222,9 @@ def worker_loop():
                     stderr=subprocess.STDOUT,
                     text=True,
                     encoding='utf-8',
-                    errors='replace'
+                    errors='replace',
+                    startupinfo=startupinfo,
+                    creationflags=creationflags
                 )
                 
                 with current_job_lock:
