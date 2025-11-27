@@ -14,6 +14,7 @@ from flask import Flask, request, jsonify, Response, stream_with_context
 from threading import Lock
 from PIL import Image  # 이미지 리사이징을 위해 Pillow 라이브러리
 from flask_cors import CORS
+from flask import Flask, send_from_directory
 
 # ========================================================
 # [Config] 경로 및 설정
@@ -25,7 +26,7 @@ RESULT_DIR = os.path.join(BASE_DIR, 'results')
 # 임시 고정 모델 (추후 preset에 따라 변경 가능)
 DEFAULT_MODEL_PATH = os.path.join(MODEL_DIR, 'sd_v-1-5.safetensors')
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
 
 # ========================================================
@@ -424,6 +425,16 @@ def stop_generation():
         return jsonify({"result": "fail", "message": "Session ID not found in queue or active jobs."})
     else:
         return jsonify({"result": "success", "stopped_at": stopped_where})
+
+@app.route('/')
+def index():
+    # 메인 페이지에서 바로 Piskel 에디터를 보여줄 경우
+    return send_from_directory(os.path.join(app.static_folder, 'editor', 'prod'), 'index.html')
+
+# Piskel 내부에서 로딩하는 js, css, 이미지 등을 위한 경로 처리
+@app.route('/<path:filename>')
+def serve_editor_files(filename):
+    return send_from_directory(os.path.join(app.static_folder, 'editor', 'prod'), filename)
 
 
 if __name__ == '__main__':
