@@ -13,6 +13,7 @@ import random  # 난수 생성을 위한 random 모듈
 from flask import Flask, request, jsonify, Response, stream_with_context
 from threading import Lock
 from PIL import Image  # 이미지 리사이징을 위해 Pillow 라이브러리
+from flask_cors import CORS
 
 # ========================================================
 # [Config] 경로 및 설정
@@ -25,6 +26,7 @@ RESULT_DIR = os.path.join(BASE_DIR, 'results')
 DEFAULT_MODEL_PATH = os.path.join(MODEL_DIR, 'sd_v-1-5.safetensors')
 
 app = Flask(__name__)
+CORS(app)
 
 # ========================================================
 # [System] 전역 상태 관리 (In-Memory)
