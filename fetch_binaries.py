@@ -76,54 +76,78 @@ def download_file(url, dest, name):
     except Exception as e:
         print(f">> [ERROR] Exception occurred: {e}")
         return 0
-def main():
-    # 1. 기존 bin 폴더 초기화
-    if os.path.exists(DEST_DIR):
-        shutil.rmtree(DEST_DIR)
-    os.makedirs(DEST_DIR)
 
+def main():
     structure = []
 
-    # 2. 다운로드 및 압축 해제
-    for ver, target in TARGETS.items():
-        url = BASE_URL + target
-        # 다운로드 경로: bin/cpu, bin/cuda, bin/cuda_dll 등
-        if download_and_extract(url, os.path.join(DEST_DIR, ver)):
-            structure.append(f'{DEST_DIR}/{ver}')
+    # ========================================================
+    # 1. 바이너리 (bin 폴더) 체크 및 다운로드
+    # ========================================================
+    # 폴더가 없거나(False), 있어도 내용물이 비어있으면(not listdir) 다운로드 진행
+    if not os.path.exists(DEST_DIR) or not os.listdir(DEST_DIR):
+        print(f">> [SYSTEM] '{DEST_DIR}' is empty or missing. Starting download...")
 
-    # 3. [추가된 로직] cuda_dll -> cuda 병합 및 정리
-    cuda_path = os.path.join(DEST_DIR, "cuda")
-    dll_path = os.path.join(DEST_DIR, "cuda_dll")
+        # 기존 bin 폴더가 있다면(비어있지만) 안전하게 초기화 후 재생성
+        if os.path.exists(DEST_DIR):
+            shutil.rmtree(DEST_DIR)
+        os.makedirs(DEST_DIR)
 
-    # 두 폴더가 모두 존재할 때만 병합 진행
-    if os.path.exists(cuda_path) and os.path.exists(dll_path):
-        print(f"\n>> [MERGE] Moving files from '{dll_path}' to '{cuda_path}'...")
+        # 다운로드 및 압축 해제
+        for ver, target in TARGETS.items():
+            url = BASE_URL + target
+            # 다운로드 경로: bin/cpu, bin/cuda, bin/cuda_dll 등
+            if download_and_extract(url, os.path.join(DEST_DIR, ver)):
+                structure.append(f'{DEST_DIR}/{ver}')
+
+        # cuda_dll -> cuda 병합 및 정리
+        cuda_path = os.path.join(DEST_DIR, "cuda")
+        dll_path = os.path.join(DEST_DIR, "cuda_dll")
+
+        # 두 폴더가 모두 존재할 때만 병합 진행
+        if os.path.exists(cuda_path) and os.path.exists(dll_path):
+            print(f"\n>> [MERGE] Moving files from '{dll_path}' to '{cuda_path}'...")
+            
+            items = os.listdir(dll_path)
+            for item in items:
+                src = os.path.join(dll_path, item)
+                dst = os.path.join(cuda_path, item)
+
+                if os.path.exists(dst):
+                    if os.path.isdir(dst):
+                        shutil.rmtree(dst)
+                    else:
+                        os.remove(dst)
+                shutil.move(src, dst)
+            shutil.rmtree(dll_path)
+            print(f">> [MERGE] Cleanup '{dll_path}' complete.")
+
+            # 최종 출력 리스트에서 cuda_dll 제거
+            structure = [s for s in structure if "cuda_dll" not in s]
+    else:
+        print(f">> [SKIP] '{DEST_DIR}' folder already exists and is not empty.")
+        # 이미 존재하므로 현재 구조를 읽어서 리스트에 추가 (출력용)
+        for item in os.listdir(DEST_DIR):
+             if os.path.isdir(os.path.join(DEST_DIR, item)):
+                 structure.append(f'{DEST_DIR}/{item}')
+
+    # ========================================================
+    # 2. 모델 (models 폴더) 체크 및 다운로드
+    # ========================================================
+    # 폴더가 없거나, 있어도 내용물이 비어있으면 다운로드 진행
+    if not os.path.exists(MODEL_DIR) or not os.listdir(MODEL_DIR):
+        print(f"\n>> [SYSTEM] '{MODEL_DIR}' is empty or missing. Starting download...")
         
-        items = os.listdir(dll_path)
-        for item in items:
-            src = os.path.join(dll_path, item)
-            dst = os.path.join(cuda_path, item)
+        for model_name, model_url in MODELS.items():
+            model_dest = os.path.join(MODEL_DIR)
+            os.makedirs(model_dest, exist_ok=True)
+            if download_file(model_url, model_dest, model_name):
+                structure.append(f'{model_dest}/{model_name}')
+    else:
+        print(f">> [SKIP] '{MODEL_DIR}' folder already exists and is not empty.")
+        for item in os.listdir(MODEL_DIR):
+            structure.append(f'{MODEL_DIR}/{item}')
 
-            if os.path.exists(dst):
-                if os.path.isdir(dst):
-                    shutil.rmtree(dst)
-                else:
-                    os.remove(dst)
-            shutil.move(src, dst)
-        shutil.rmtree(dll_path)
-        print(f">> [MERGE] Cleanup '{dll_path}' complete.")
-
-        # 최종 출력 리스트에서 cuda_dll 제거 (보기 좋게)
-        structure = [s for s in structure if "cuda_dll" not in s]
-
-    # 모델 다운로드
-    for model_name, model_url in MODELS.items():
-        model_dest = os.path.join(MODEL_DIR)
-        os.makedirs(model_dest, exist_ok=True)
-        if download_file(model_url, model_dest, model_name):
-            structure.append(f'{model_dest}/{model_name}')
-
-    print("\n>> [SYSTEM] Binary fetch complete.")
+    print("\n>> [SYSTEM] Process complete.")
     print(f"   Structure: {', '.join(structure)}")
 
 if __name__ == "__main__":
