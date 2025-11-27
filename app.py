@@ -63,24 +63,24 @@ last_heartbeat_time = time.time()
 # [System] 하드웨어 가속 감지
 # ========================================================
 def detect_executable():
-    print(">> [INIT] Hardware Detection Started...")
-    cuda_path = os.path.join(BIN_DIR, 'cuda', 'sd.exe')
-    if os.path.exists(cuda_path):
-        try:
-            subprocess.check_output('nvidia-smi', shell=True)
-            print(">> [INIT] NVIDIA GPU Detected. Selected: CUDA")
-            return cuda_path
-        except Exception:
-            pass
+    # print(">> [INIT] Hardware Detection Started...")
+    # cuda_path = os.path.join(BIN_DIR, 'cuda', 'sd.exe')
+    # if os.path.exists(cuda_path):
+    #     try:
+    #         subprocess.check_output('nvidia-smi', shell=True)
+    #         print(">> [INIT] NVIDIA GPU Detected. Selected: CUDA")
+    #         return cuda_path
+    #     except Exception:
+    #         pass
     
-    vulkan_path = os.path.join(BIN_DIR, 'vulkan', 'sd.exe')
-    if os.path.exists(vulkan_path):
-        print(">> [INIT] Selected: Vulkan (Fallback)")
-        return vulkan_path
+    # vulkan_path = os.path.join(BIN_DIR, 'vulkan', 'sd.exe')
+    # if os.path.exists(vulkan_path):
+    #     print(">> [INIT] Selected: Vulkan (Fallback)")
+    #     return vulkan_path
 
-    cpu_path = os.path.join(BIN_DIR, 'cpu', 'sd.exe')
-    print(">> [INIT] Selected: CPU (Fallback)")
-    return cpu_path
+    # cpu_path = os.path.join(BIN_DIR, 'cpu', 'sd.exe')
+    # print(">> [INIT] Selected: CPU (Fallback)")
+    return os.path.join(BIN_DIR, 'sd.exe')
 
 SD_EXE_PATH = detect_executable()
 
@@ -395,7 +395,7 @@ if __name__ == '__main__':
     
     # 1. 자동 종료 모니터 스레드 시작
     monitor_thread = threading.Thread(target=shutdown_monitor, daemon=True)
-    monitor_thread.start()
+    monitor_thread.start() 
 
     # 2. 브라우저 자동 실행 (1.5초 지연)
     threading.Timer(1.5, open_browser).start()

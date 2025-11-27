@@ -24,6 +24,7 @@ MODELS = {
     "sd_v-1-5.safetensors": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors",
 }
 
+
 def download_and_extract(url, extract_to):
     print(f">> [DOWNLOAD] Fetching {url}...")
     try:
@@ -76,78 +77,79 @@ def download_file(url, dest, name):
     except Exception as e:
         print(f">> [ERROR] Exception occurred: {e}")
         return 0
-
+    
 def main():
-    structure = []
+    # 1. 사용자 입력 받기 (Interactive Mode)
+    print("==========================================")
+    print("   Pixelon Server Binary Downloader")
+    print("==========================================")
+    print("Select target version to install:")
+    print("   1. CUDA (NVIDIA GPU)")
+    print("   2. Vulkan (AMD/Intel/NVIDIA GPU)")
+    print("   3. CPU (No GPU / AVX2)")
+    print("==========================================")
+    
+    choice = input(">> Enter choice (1-3 or name): ").strip().lower()
+    
+    if choice in ['1', 'cuda']:
+        target_mode = 'cuda'
+    elif choice in ['2', 'vulkan']:
+        target_mode = 'vulkan'
+    elif choice in ['3', 'cpu']:
+        target_mode = 'cpu'
+    else:
+        print(f">> [WARN] Invalid input '{choice}'. Defaulting to 'cuda'.")
+        target_mode = 'cuda'
 
-    # ========================================================
-    # 1. 바이너리 (bin 폴더) 체크 및 다운로드
-    # ========================================================
-    # 폴더가 없거나(False), 있어도 내용물이 비어있으면(not listdir) 다운로드 진행
-    if not os.path.exists(DEST_DIR) or not os.listdir(DEST_DIR):
-        print(f">> [SYSTEM] '{DEST_DIR}' is empty or missing. Starting download...")
+    print(f">> [SYSTEM] Selected Target: {target_mode.upper()}")
 
-        # 기존 bin 폴더가 있다면(비어있지만) 안전하게 초기화 후 재생성
-        if os.path.exists(DEST_DIR):
-            shutil.rmtree(DEST_DIR)
+    # 2. 다운로드할 대상 필터링
+    keys_to_download = []
+    if target_mode == "cuda":
+        # CUDA 모드는 실행 파일(cuda)과 라이브러리(cuda_dll)가 모두 필요함
+        keys_to_download = ["cuda", "cuda_dll"]
+    elif target_mode in TARGETS:
+        keys_to_download = [target_mode]
+    
+    # 3. 기존 bin 폴더 초기화 (부분 삭제 대신 폴더가 없으면 생성)
+    if not os.path.exists(DEST_DIR):
         os.makedirs(DEST_DIR)
 
-        # 다운로드 및 압축 해제
-        for ver, target in TARGETS.items():
-            url = BASE_URL + target
-            # 다운로드 경로: bin/cpu, bin/cuda, bin/cuda_dll 등
-            if download_and_extract(url, os.path.join(DEST_DIR, ver)):
-                structure.append(f'{DEST_DIR}/{ver}')
+    structure = []
 
-        # cuda_dll -> cuda 병합 및 정리
-        cuda_path = os.path.join(DEST_DIR, "cuda")
-        dll_path = os.path.join(DEST_DIR, "cuda_dll")
+    # 4. 다운로드 및 압축 해제 (선택된 타겟만)
+    for ver, target in TARGETS.items():
+        if ver not in keys_to_download:
+            continue
 
-        # 두 폴더가 모두 존재할 때만 병합 진행
-        if os.path.exists(cuda_path) and os.path.exists(dll_path):
-            print(f"\n>> [MERGE] Moving files from '{dll_path}' to '{cuda_path}'...")
-            
-            items = os.listdir(dll_path)
-            for item in items:
-                src = os.path.join(dll_path, item)
-                dst = os.path.join(cuda_path, item)
+        # [Check] 이미 설치되어 있는지 확인
+        # bin 폴더 안에 sd.exe가 있으면 이미 설치된 것으로 간주
+        sd_exe_path = os.path.join(DEST_DIR, "sd.exe")
+        if os.path.exists(sd_exe_path):
+            structure.append(f'{DEST_DIR} (Skipped)')
+            continue
 
-                if os.path.exists(dst):
-                    if os.path.isdir(dst):
-                        shutil.rmtree(dst)
-                    else:
-                        os.remove(dst)
-                shutil.move(src, dst)
-            shutil.rmtree(dll_path)
-            print(f">> [MERGE] Cleanup '{dll_path}' complete.")
-
-            # 최종 출력 리스트에서 cuda_dll 제거
-            structure = [s for s in structure if "cuda_dll" not in s]
-    else:
-        print(f">> [SKIP] '{DEST_DIR}' folder already exists and is not empty.")
-        # 이미 존재하므로 현재 구조를 읽어서 리스트에 추가 (출력용)
-        for item in os.listdir(DEST_DIR):
-             if os.path.isdir(os.path.join(DEST_DIR, item)):
-                 structure.append(f'{DEST_DIR}/{item}')
-
-    # ========================================================
-    # 2. 모델 (models 폴더) 체크 및 다운로드
-    # ========================================================
-    # 폴더가 없거나, 있어도 내용물이 비어있으면 다운로드 진행
-    if not os.path.exists(MODEL_DIR) or not os.listdir(MODEL_DIR):
-        print(f"\n>> [SYSTEM] '{MODEL_DIR}' is empty or missing. Starting download...")
+        url = BASE_URL + target
         
-        for model_name, model_url in MODELS.items():
-            model_dest = os.path.join(MODEL_DIR)
-            os.makedirs(model_dest, exist_ok=True)
-            if download_file(model_url, model_dest, model_name):
-                structure.append(f'{model_dest}/{model_name}')
-    else:
-        print(f">> [SKIP] '{MODEL_DIR}' folder already exists and is not empty.")
-        for item in os.listdir(MODEL_DIR):
-            structure.append(f'{MODEL_DIR}/{item}')
+        # 하위 폴더(ver)가 아닌 bin 폴더(DEST_DIR)에 바로 압축 해제
+        if download_and_extract(url, DEST_DIR):
+            structure.append(f'{DEST_DIR} ({ver})')
 
-    print("\n>> [SYSTEM] Process complete.")
+    # 5. 모델 다운로드 (항상 수행)
+    for model_name, model_url in MODELS.items():
+        model_dest = os.path.join(MODEL_DIR)
+        model_file_path = os.path.join(model_dest, model_name)
+
+        # [Check] 모델 파일이 이미 있는지 확인
+        if os.path.exists(model_file_path):
+            structure.append(f'{model_file_path} (Skipped)')
+            continue
+
+        # download_file 함수 내부에서 makedirs 하므로 생략 가능하나 안전을 위해 유지
+        if download_file(model_url, model_dest, model_name):
+            structure.append(f'{model_dest}/{model_name}')
+
+    print("\n>> [SYSTEM] Binary fetch complete.")
     print(f"   Structure: {', '.join(structure)}")
 
 if __name__ == "__main__":
