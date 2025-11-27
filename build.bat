@@ -30,7 +30,7 @@ pyinstaller --noconsole --onedir --name "PixelOnServer" ^
     --collect-all "flask_socketio" ^
     --add-data "static;static" ^
     --icon "icon.ico" ^
-    "src/app.py"
+    "app.py"
 
 if %errorlevel% neq 0 (
     echo [ERROR] Server build failed.
