@@ -11,9 +11,9 @@ VERSION_TAG = "master-377-2034588"
 VERSION = "2034588"
 
 TARGETS = {
+    "cuda_dll": f"cudart-sd-bin-win-cu12-x64.zip",
     "cpu": f"sd-master-{VERSION}-bin-win-avx-x64.zip",
     "cuda": f"sd-master-{VERSION}-bin-win-cuda12-x64.zip",
-    "cuda_dll": f"cudart-sd-bin-win-cu12-x64.zip",
     "vulkan": f"sd-master-{VERSION}-bin-win-vulkan-x64.zip"
 }
 BASE_URL = f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{VERSION_TAG}/"
@@ -107,7 +107,7 @@ def main():
     keys_to_download = []
     if target_mode == "cuda":
         # CUDA 모드는 실행 파일(cuda)과 라이브러리(cuda_dll)가 모두 필요함
-        keys_to_download = ["cuda", "cuda_dll"]
+        keys_to_download = ["cuda_dll", "cuda"]
     elif target_mode in TARGETS:
         keys_to_download = [target_mode]
     
