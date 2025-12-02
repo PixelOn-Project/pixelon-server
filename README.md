@@ -18,11 +18,11 @@
 * **내보내기:** 생성된 이미지를 즉시 Editor 레이어로 내보내기
 
 ### System Requirements (Minimum & Recommended)
-| 구분 | 최소 사양 | 권장 사양
+| 구분 | 최소 사양 | 권장 사양 |
 | :--- | :--- | :--- |
 | **CPU** | Intel i5 이상 | Intel i5 이상 |
 | **RAM** | 16GB 이상 | 16GB 이상 |
-| **GPU** | NVIDIA RTX 2000번대 이상 (VRAM 4GB 이상) | NVIDIA RTX 3070 이상
+| **GPU** | NVIDIA RTX 2000번대 이상 (VRAM 4GB 이상) | NVIDIA RTX 3070 이상 |
 | **Disk** | 여유공간 20GB+ 필요 | 여유공간 20GB+ 필요 |
 
 > **Notice 1:** CPU만으로도 생성 기능을 사용할 수 있으나, 장당 2~3분 이상의 시간이 소요될 수 있습니다. (RTX 2060 기준 약 10초 소요)
@@ -31,16 +31,16 @@
 ### Open Source Credits
 * [Stable Diffusion C++](https://github.com/leejet/stable-diffusion.cpp)
 * [Piskel](https://www.piskelapp.com/)
-    * [PixelOn Piskel Repository](링크를_넣어주세요)
+    * [PixelOn Piskel Repository](URL_HERE)
 * **Stable Diffusion Models**
-    * [LORA Model](링크를_넣어주세요)
+    * [LORA Model](URL_HERE)
     * 그 외 활용된 모델들
 
 ---
 
 ## How to install Piskel & PixelOn?
 ![PixelOn Installer](imgs/2.png)
-1. **[PixelOn Installer 다운로드](링크를_넣어주세요)**를 클릭하여 설치 파일을 받습니다.
+1. **[PixelOn Installer 다운로드](URL_HERE)**를 클릭하여 설치 파일을 받습니다.
 2. 설치 프로그램을 실행하면 시스템을 자동으로 스캔하여 최적의 가속화 버전(CUDA 등)을 선택합니다.
 3. 설치가 완료되면 바탕화면의 **PixelOn**을 실행합니다.
 
@@ -57,7 +57,7 @@
 ## How to Use PixelOn?
 
 ### 1. Piskel Editor
-PixelOn을 실행하면 Piskel 에디터 화면이 나타납니다. 기존 Piskel 사용법과 동일하게 도트 작업을 수행할 수 있습니다. 자세한 사용 방법은 Piskel을 
+PixelOn을 실행하면 Piskel 에디터 화면이 나타납니다. 기존 Piskel 사용법과 동일하게 도트 작업을 수행할 수 있습니다. 자세한 사용 방법은 **[Piskel 공식 가이드](https://www.piskelapp.com/wiki/help)**를 참고해주세요.
 
 ### 2. Simple Prompt
 ![Simple Prompt UI](imgs/3.png)
@@ -87,27 +87,31 @@ PixelOn을 실행하면 Piskel 에디터 화면이 나타납니다. 기존 Piske
 * **Negative Prompt:** 제외하고 싶은 요소(예: 저화질, 손가락 기형 등)를 작성합니다. (태그 형식, Enter로 구분)
 * **Preset:** 상황에 맞는 모델 프리셋을 선택합니다.
     * *Normal:* 가장 기본적인 범용 모델
-* **Seed:** 랜덤 시드가 자동 부여되지만, 특정 구도를 고정하고 싶다면 직접 숫자를 입력하세요.
+* **Resolution:** 생성할 이미지의 크기를 조절합니다.
+* **Count:** 생성할 이미지의 개수를 조절합니다.
+
+> **주의:** 해상도가 너무 작다면, 이미지가 정상적으로 생성되지 않을 수 있습니다.
 
 #### ⓒ. Results
-![Settings UI](imgs/7.png)
-이미지 생성의 핵심 설정을 조작합니다.
+![Results UI](imgs/7.png)
+생성된 이미지를 확인하고, 제거할 수 있습니다.
 
-* **Positive Prompt:** 생성하고자 하는 장면을 묘사합니다. (태그 형식, Enter로 구분)
-* **Negative Prompt:** 제외하고 싶은 요소(예: 저화질, 손가락 기형 등)를 작성합니다. (태그 형식, Enter로 구분)
-* **Preset:** 상황에 맞는 모델 프리셋을 선택합니다.
-    * *Normal:* 가장 기본적인 범용 모델
-* **Seed:** 랜덤 시드가 자동 부여되지만, 특정 구도를 고정하고 싶다면 직접 숫자를 입력하세요.
+* **마우스 좌클릭 시:** 이미지가 선택됩니다.
+* **이미지 상단 ... 클릭 시:** 이미지에서 조작할 수 있는 기능들이 표시됩니다.
+    * **Transfer:** 이미지 생성 시 사용된 설정을 불러옵니다.
+    * **Delete:** 이미지를 삭제합니다.
+* **Cancel:** 선택된 이미지를 해제합니다.
+* **Delete Selected:** 선택된 이미지를 모두 삭제합니다.
 
-#### ⓓ Log, Expert
-![Settings UI](imgs/8.png)
-이미지 생성의 핵심 설정을 조작합니다.
+> **주의:** 삭제 시 복구(Undo)가 불가능하므로 신중하게 결정해주세요.
 
-* **Positive Prompt:** 생성하고자 하는 장면을 묘사합니다. (태그 형식, Enter로 구분)
-* **Negative Prompt:** 제외하고 싶은 요소(예: 저화질, 손가락 기형 등)를 작성합니다. (태그 형식, Enter로 구분)
-* **Preset:** 상황에 맞는 모델 프리셋을 선택합니다.
-    * *Normal:* 가장 기본적인 범용 모델
-* **Seed:** 랜덤 시드가 자동 부여되지만, 특정 구도를 고정하고 싶다면 직접 숫자를 입력하세요.
+#### ⓓ. Log, Expert
+![Log UI](imgs/8.png)
+이미지 생성 기능이 동작하는지 확인하고, 선택된 이미지를 Piskel Editor로 내보낼 수 있습니다.
+
+* **Move To Frame:** 선택된 모든 이미지를 새로운 Frame을 만들어 내보냅니다. (여러 장에 유용)
+* **Move To Layer:** 마지막으로 선택된 이미지를 현재 Layer로 내보냅니다. (한 장에 유용)
+
 ---
 
 ## Development Environment
