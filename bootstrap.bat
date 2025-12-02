@@ -28,6 +28,11 @@ cd ../
 if not exist "static\editor" mkdir "static\editor"
 xcopy /E /Y /I "piskel\dest\*" "static\editor\"
 
+if not exist "static\tutorial" mkdir "static\tutorial"
+if not exist "static\tutorial\imgs" mkdir "static\tutorial\imgs"
+xcopy /E /Y /I "html\*" "static\tutorial"
+xcopy /E /Y /I "imgs\*" "static\tutorial\imgs"
+
 call python -m venv venv
 call ./venv/Scripts/activate
 call pip install -r requirements.txt
