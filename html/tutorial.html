@@ -92,40 +92,64 @@
             font-size: 1.4rem;
             color: #444;
             margin-top: 40px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
         }
-        h4 {
+        /* 레이아웃 개선을 위한 스타일 (좌 이미지, 우 텍스트) */
+        .usage-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            align-items: flex-start;
+            border-bottom: 1px solid #f1f3f5;
+            padding-bottom: 30px;
+        }
+        .usage-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .usage-img {
+            flex: 1;
+            text-align: center;
+            background: #222;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .usage-text {
+            flex: 1;
+        }
+        .usage-text h4 {
             font-size: 1.2rem;
-            color: #555;
-            margin-top: 30px;
-            margin-bottom: 10px;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
             background: #f1f3f5;
-            padding: 8px 12px;
+            padding: 6px 12px;
             border-radius: 6px;
             display: inline-block;
         }
         
-        /* Components */
-        .img-container {
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: block;
+            margin: 0 auto;
+        }
+        .img-container { /* 기존 상단 1,2번 항목용 */
             text-align: center;
             margin: 25px 0;
             background: #222;
             border-radius: 8px;
             padding: 20px;
         }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
+
         p { margin-bottom: 15px; }
         ul, ol { margin-bottom: 20px; padding-left: 25px; }
         li { margin-bottom: 8px; }
         
-        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -143,7 +167,6 @@
             width: 25%;
         }
         
-        /* Code & Notes */
         code {
             background: #f1f3f5;
             padding: 3px 6px;
@@ -156,7 +179,7 @@
             background-color: #fff8e1;
             border-left: 4px solid #ffc107;
             padding: 15px 20px;
-            margin: 20px 0;
+            margin: 15px 0;
             border-radius: 0 4px 4px 0;
             font-size: 0.95rem;
         }
@@ -164,9 +187,10 @@
             background-color: #fff5f5;
             border-left: 4px solid #ff6b6b;
             padding: 15px 20px;
-            margin: 20px 0;
+            margin: 15px 0;
             border-radius: 0 4px 4px 0;
             color: #c0392b;
+            font-weight: bold;
         }
         .btn-link {
             display: inline-block;
@@ -185,7 +209,8 @@
             body { flex-direction: column; }
             nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #ddd; padding: 15px; }
             main { margin-left: 0; padding: 20px; }
-            img { max-width: 100%; }
+            .usage-row { flex-direction: column; } /* 모바일에서는 세로 배치 */
+            .usage-img { width: 100%; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -316,60 +341,80 @@
             <div class="img-container">
                 <img src="/static/tutorial/imgs/4.png" alt="Detail Dialog UI">
             </div>
-            <p>더 정교한 작업을 원한다면 Detail 창을 엽니다.</p>
-            <ul>
-                <li><strong>ⓐ History:</strong> 생성된 세션 목록입니다. 클릭하여 이전 기록을 불러옵니다.</li>
-                <li><strong>ⓑ Prompt & Settings:</strong> 프롬프트 및 세부 설정을 조작합니다.</li>
-                <li><strong>ⓒ Results:</strong> 생성된 결과 이미지가 표시됩니다.</li>
-                <li><strong>ⓓ Log, Expert:</strong> 로그를 확인하거나 이미지를 에디터로 내보냅니다.</li>
-            </ul>
+            <p>
+                더 정교한 작업을 원한다면 Detail 창을 엽니다. 아래에서 각 구성 요소의 기능과 사용법을 확인하세요.
+            </p>
 
-            <h4>ⓐ History Management</h4>
-            <div class="img-container">
-                <img src="/static/tutorial/imgs/5.png" alt="History UI">
-            </div>
-            <p>이전 작업 세션을 관리합니다. 세션을 클릭해 기록을 조회하거나, <code>...</code> 버튼으로 이름 변경/삭제가 가능합니다.</p>
-            <div class="warning">※ 주의: 삭제 시 복구(Undo)가 불가능하므로 신중하게 결정해주세요.</div>
+            <br>
 
-            <h4>ⓑ Prompt & Settings</h4>
-            <div class="img-container">
-                <img src="/static/tutorial/imgs/6.png" alt="Settings UI">
-            </div>
-            <ul>
-                <li><strong>Positive Prompt:</strong> 생성할 장면 묘사 (태그 형식, Enter로 구분)</li>
-                <li><strong>Negative Prompt:</strong> 제외할 요소 작성 (예: 저화질, 기형 등)</li>
-                <li><strong>Preset:</strong> Normal(범용) 등 모델 프리셋 선택</li>
-                <li><strong>Resolution / Count:</strong> 이미지 크기와 생성 개수 조절</li>
-            </ul>
-            <div class="note">주의: 해상도가 너무 작으면 이미지가 정상적으로 생성되지 않을 수 있습니다.</div>
-
-            <h4>ⓒ Results</h4>
-            <div class="img-container">
-                <img src="/static/tutorial/imgs/7.png" alt="Results UI">
-            </div>
-            <p>생성된 이미지를 확인하고 관리합니다.</p>
-            <ul>
-                <li><strong>좌클릭:</strong> 이미지 선택</li>
-                <li><strong>이미지 상단 ... 클릭:</strong>
+            <div class="usage-row">
+                <div class="usage-img">
+                    <img src="/static/tutorial/imgs/5.png" alt="History UI">
+                </div>
+                <div class="usage-text">
+                    <h4>ⓐ History Management</h4>
+                    <p><b>History</b> 탭에서 이전 작업 세션을 관리합니다.</p>
                     <ul>
-                        <li>Transfer: 생성 당시 설정(프롬프트 등) 불러오기</li>
-                        <li>Delete: 해당 이미지 삭제</li>
+                        <li><b>세션 클릭:</b> 과거 생성 기록을 조회합니다.</li>
+                        <li><b>... 버튼:</b> 세션 이름을 변경하거나 삭제합니다.</li>
                     </ul>
-                </li>
-                <li><strong>Cancel:</strong> 이미지 선택 해제</li>
-                <li><strong>Delete Selected:</strong> 선택된 이미지 일괄 삭제</li>
-            </ul>
-            <div class="warning">※ 주의: 이미지를 삭제하면 복구할 수 없습니다.</div>
-
-            <h4>ⓓ Log, Expert</h4>
-            <div class="img-container">
-                <img src="/static/tutorial/imgs/8.png" alt="Log UI">
+                    <div class="warning">※ 주의: 삭제 시 복구(Undo)가 불가능하므로 신중하게 결정해주세요.</div>
+                </div>
             </div>
-            <p>작동 로그를 확인하거나 이미지를 Piskel Editor로 내보냅니다.</p>
-            <ul>
-                <li><strong>Move To Frame:</strong> 선택된 이미지들을 각각 새로운 프레임으로 내보냅니다. (여러 장 작업 시 유용)</li>
-                <li><strong>Move To Layer:</strong> 마지막에 선택된 이미지를 현재 레이어로 내보냅니다. (한 장 작업 시 유용)</li>
-            </ul>
+
+            <div class="usage-row">
+                <div class="usage-img">
+                    <img src="/static/tutorial/imgs/6.png" alt="Settings UI">
+                </div>
+                <div class="usage-text">
+                    <h4>ⓑ Prompt & Settings</h4>
+                    <p>이미지 생성의 핵심 설정을 조작합니다.</p>
+                    <ul>
+                        <li><b>Positive Prompt:</b> 생성할 장면 묘사 (태그 형식, Enter 구분)</li>
+                        <li><b>Negative Prompt:</b> 제외할 요소 작성 (예: 저화질 등)</li>
+                        <li><b>Preset:</b> 상황에 맞는 모델 프리셋 선택 (Normal, Pixel Art 등)</li>
+                        <li><b>Resolution / Count:</b> 이미지 크기와 생성 개수 조절</li>
+                    </ul>
+                    <div class="note">주의: 해상도가 너무 작으면 이미지가 정상적으로 생성되지 않을 수 있습니다.</div>
+                </div>
+            </div>
+
+            <div class="usage-row">
+                <div class="usage-img">
+                    <img src="/static/tutorial/imgs/7.png" alt="Results UI">
+                </div>
+                <div class="usage-text">
+                    <h4>ⓒ Results</h4>
+                    <p>생성된 이미지를 확인하고 관리합니다.</p>
+                    <ul>
+                        <li><b>좌클릭:</b> 이미지 선택</li>
+                        <li><b>... 클릭 (이미지 상단):</b>
+                            <ul>
+                                <li><i>Transfer:</i> 생성 당시 설정 불러오기</li>
+                                <li><i>Delete:</i> 해당 이미지 삭제</li>
+                            </ul>
+                        </li>
+                        <li><b>Cancel:</b> 이미지 선택 해제</li>
+                        <li><b>Delete Selected:</b> 선택된 이미지 일괄 삭제</li>
+                    </ul>
+                    <div class="warning">※ 주의: 이미지를 삭제하면 복구할 수 없습니다.</div>
+                </div>
+            </div>
+
+            <div class="usage-row">
+                <div class="usage-img">
+                    <img src="/static/tutorial/imgs/8.png" alt="Log UI">
+                </div>
+                <div class="usage-text">
+                    <h4>ⓓ Log, Expert</h4>
+                    <p>작동 로그를 확인하거나 이미지를 Editor로 내보냅니다.</p>
+                    <ul>
+                        <li><b>Move To Frame:</b> 선택된 이미지들을 각각 <b>새로운 프레임</b>으로 내보냅니다. (여러 장 작업 시 유용)</li>
+                        <li><b>Move To Layer:</b> 마지막 선택 이미지를 <b>현재 레이어</b>로 내보냅니다. (한 장 작업 시 유용)</li>
+                    </ul>
+                </div>
+            </div>
+
         </section>
 
         <section id="dev">
