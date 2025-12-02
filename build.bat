@@ -41,6 +41,7 @@ if %errorlevel% neq 0 (
 echo.
 echo [STEP 3/5] Building Pixelon Launcher...
 pyinstaller --noconsole --onefile --name "PixelOnLauncher" ^
+    --add-data "icon.ico;." ^
     --collect-all "customtkinter" ^
     --collect-all "pystray" ^
     --icon "icon.ico" ^
@@ -53,11 +54,11 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [STEP 4/5] Packaging Server & Launcher into 'build.zip'...
+echo "[STEP 4/5] Packaging Server & Launcher into 'build.zip'..."
 
-move "dist\PixelonLauncher.exe" "dist\PixelonServer\" >nul
+move "dist\PixelOnLauncher.exe" "dist\PixelOnServer\" >nul
 
-powershell -Command "Compress-Archive -Path 'dist\PixelonServer\*' -DestinationPath 'dist\build.zip' -Force"
+powershell -Command "Compress-Archive -Path 'dist\PixelOnServer\*' -DestinationPath 'dist\build.zip' -Force"
 
 if exist "dist\build.zip" (
     echo [OK] build.zip created successfully.
@@ -75,7 +76,7 @@ pyinstaller --noconsole --onefile --uac-admin --name "PixelOnSetup" ^
     --hidden-import "winshell" ^
     --hidden-import "win32com" ^
     --hidden-import "hardware_scan" ^
-    --paths "Pixelon Client" ^
+    --paths "src" ^
     --icon "icon.ico" ^
     "src/installer.py"
 
