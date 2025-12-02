@@ -65,54 +65,93 @@ PixelOn을 실행하면 Piskel 에디터 화면이 나타납니다. 기존 Piske
 
 ### 3. Detail Dialog
 ![Detail Dialog UI](imgs/4.png)
-더 정교한 작업을 원한다면 Detail 창을 엽니다. 구성 요소는 다음과 같습니다.
+더 정교한 작업을 원한다면 Detail 창을 엽니다. 각 구성 요소의 상세 설명은 아래와 같습니다.
 
-* **ⓐ History:** 생성한 세션 목록입니다. 클릭하여 이전 기록을 불러옵니다.
-* **ⓑ Prompt & Settings:** 프롬프트 입력 및 세부 설정을 조작합니다.
-* **ⓒ Results:** 생성된 결과 이미지가 표시됩니다.
-* **ⓓ Log, Expert:** 로컬 작업 로그를 확인하거나 이미지를 에디터로 내보낼 수 있습니다.
+<br>
 
-#### ⓐ. History Management
-![History UI](imgs/5.png)
-`History` 탭에서 이전 작업 세션을 관리합니다.
-* 세션을 클릭하여 과거 생성 기록을 조회할 수 있습니다.
-* `...` 버튼을 눌러 세션 이름을 변경하거나 삭제할 수 있습니다.
-* **주의:** 삭제 시 복구(Undo)가 불가능하므로 신중하게 결정해주세요.
+<table>
+<tr>
+<td width="50%" valign="top">
+    <img src="imgs/5.png" alt="History UI" style="max-width:100%;">
+</td>
+<td width="50%" valign="top">
+    <h3>ⓐ History Management</h3>
+    <p><b>History</b> 탭에서 이전 작업 세션을 관리합니다.</p>
+    <ul>
+        <li><b>세션 클릭:</b> 과거 생성 기록을 조회합니다.</li>
+        <li><b>... 버튼:</b> 세션 이름을 변경하거나 삭제합니다.</li>
+        <li><b>주의:</b> 삭제 시 복구(Undo)가 불가능하므로 신중하게 결정해주세요.</li>
+    </ul>
+</td>
+</tr>
+</table>
 
-#### ⓑ. Prompt & Settings
-![Settings UI](imgs/6.png)
-이미지 생성의 핵심 설정을 조작합니다.
+<br>
 
-* **Positive Prompt:** 생성하고자 하는 장면을 묘사합니다. (태그 형식, Enter로 구분)
-* **Negative Prompt:** 제외하고 싶은 요소(예: 저화질, 손가락 기형 등)를 작성합니다. (태그 형식, Enter로 구분)
-* **Preset:** 상황에 맞는 모델 프리셋을 선택합니다.
-    * *Normal:* 가장 기본적인 범용 모델
-* **Resolution:** 생성할 이미지의 크기를 조절합니다.
-* **Count:** 생성할 이미지의 개수를 조절합니다.
+<table>
+<tr>
+<td width="50%" valign="top">
+    <img src="imgs/6.png" alt="Settings UI" style="max-width:100%;">
+</td>
+<td width="50%" valign="top">
+    <h3>ⓑ Prompt & Settings</h3>
+    <p>이미지 생성의 핵심 설정을 조작합니다.</p>
+    <ul>
+        <li><b>Positive Prompt:</b> 생성할 장면 묘사 (태그 형식, Enter 구분)</li>
+        <li><b>Negative Prompt:</b> 제외할 요소 작성 (예: 저화질 등)</li>
+        <li><b>Preset:</b> 상황에 맞는 모델 프리셋 선택 (Normal, Pixel Art 등)</li>
+        <li><b>Resolution / Count:</b> 이미지 크기와 생성 개수 조절</li>
+    </ul>
+    <blockquote><b>주의:</b> 해상도가 너무 작으면 이미지가 정상적으로 생성되지 않을 수 있습니다.</blockquote>
+</td>
+</tr>
+</table>
 
-> **주의:** 해상도가 너무 작다면, 이미지가 정상적으로 생성되지 않을 수 있습니다.
+<br>
 
-#### ⓒ. Results
-![Results UI](imgs/7.png)
-생성된 이미지를 확인하고, 제거할 수 있습니다.
+<table>
+<tr>
+<td width="50%" valign="top">
+    <img src="imgs/7.png" alt="Results UI" style="max-width:100%;">
+</td>
+<td width="50%" valign="top">
+    <h3>ⓒ Results</h3>
+    <p>생성된 이미지를 확인하고 관리합니다.</p>
+    <ul>
+        <li><b>좌클릭:</b> 이미지 선택</li>
+        <li><b>... 클릭 (이미지 상단):</b>
+            <ul>
+                <li><i>Transfer:</i> 생성 당시 설정 불러오기</li>
+                <li><i>Delete:</i> 해당 이미지 삭제</li>
+            </ul>
+        </li>
+        <li><b>Cancel:</b> 이미지 선택 해제</li>
+        <li><b>Delete Selected:</b> 선택된 이미지 일괄 삭제</li>
+    </ul>
+    <blockquote><b>주의:</b> 삭제 시 복구(Undo)가 불가능합니다.</blockquote>
+</td>
+</tr>
+</table>
 
-* **마우스 좌클릭 시:** 이미지가 선택됩니다.
-* **이미지 상단 ... 클릭 시:** 이미지에서 조작할 수 있는 기능들이 표시됩니다.
-    * **Transfer:** 이미지 생성 시 사용된 설정을 불러옵니다.
-    * **Delete:** 이미지를 삭제합니다.
-* **Cancel:** 선택된 이미지를 해제합니다.
-* **Delete Selected:** 선택된 이미지를 모두 삭제합니다.
+<br>
 
-> **주의:** 삭제 시 복구(Undo)가 불가능하므로 신중하게 결정해주세요.
+<table>
+<tr>
+<td width="50%" valign="top">
+    <img src="imgs/8.png" alt="Log UI" style="max-width:100%;">
+</td>
+<td width="50%" valign="top">
+    <h3>ⓓ Log, Expert</h3>
+    <p>작동 로그를 확인하거나 이미지를 Editor로 보냅니다.</p>
+    <ul>
+        <li><b>Move To Frame:</b> 선택된 이미지들을 각각 <b>새로운 프레임</b>으로 내보냅니다. (여러 장 작업 시 유용)</li>
+        <li><b>Move To Layer:</b> 마지막 선택 이미지를 <b>현재 레이어</b>로 내보냅니다. (한 장 작업 시 유용)</li>
+    </ul>
+</td>
+</tr>
+</table>
 
-#### ⓓ. Log, Expert
-![Log UI](imgs/8.png)
-이미지 생성 기능이 동작하는지 확인하고, 선택된 이미지를 Piskel Editor로 내보낼 수 있습니다.
-
-* **Move To Frame:** 선택된 모든 이미지를 새로운 Frame을 만들어 내보냅니다. (여러 장에 유용)
-* **Move To Layer:** 마지막으로 선택된 이미지를 현재 Layer로 내보냅니다. (한 장에 유용)
-
----
+<br>
 
 ## Development Environment
 
