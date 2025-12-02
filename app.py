@@ -384,6 +384,11 @@ def index():
     # 메인 페이지에서 바로 Piskel 에디터를 보여줄 경우
     return send_from_directory(os.path.join(app.static_folder, 'editor', 'prod'), 'index.html')
 
+@app.route('/tutorial')
+def tutorial ():
+    # 메인 페이지에서 바로 Piskel 에디터를 보여줄 경우
+    return send_from_directory(os.path.join(app.static_folder, 'tutorial'), 'tutorial.html')
+
 # Piskel 내부에서 로딩하는 js, css, 이미지 등을 위한 경로 처리
 @app.route('/<path:filename>')
 def serve_editor_files(filename):
