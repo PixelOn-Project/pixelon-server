@@ -37,7 +37,24 @@ SERVER_URL = f"http://{HOST}:{PORT}"
 
 # 자동 종료 설정 (초 단위)
 HEARTBEAT_TIMEOUT = 5  # 5초 동안 신호 없으면 종료
-STARTUP_GRACE_PERIOD = 10 # 서버 시작 후 10초간은 종료 안 함
+STARTUP_GRACE_PERIOD = 30 # 서버 시작 후 10초간은 종료 안 함
+
+PRESET_CONFIG = {
+    "normal": {
+        "model": "cetusMix.safetensors",
+        "lora": "PX64NOCAP.safetensors"
+    },
+    "sd character": {
+        "model": "QteaMix.safetensors",
+        "lora": "PX64NOCAP.safetensors"
+    },
+    "background": {
+        "model": "cetusMix.safetensors",
+        "lora": "PixelWorld.safetensors"
+    }
+}
+# Default Fallback
+DEFAULT_PRESET = "normal"
 
 app = Flask(__name__, static_folder='static')
 CORS(app) # CORS 허용 (로컬 파일 접근 문제 해결)
@@ -63,6 +80,7 @@ last_heartbeat_time = time.time()
 # [System] 하드웨어 가속 감지
 # ========================================================
 def detect_executable():
+    # OLD: 하드웨어 감지 로직, Installer가 감지해 설치하면서 단순화
     # print(">> [INIT] Hardware Detection Started...")
     # cuda_path = os.path.join(BIN_DIR, 'cuda', 'sd.exe')
     # if os.path.exists(cuda_path):
@@ -163,7 +181,7 @@ def worker_loop():
 
         try:
             req_size = int(spec.get('width', 512))
-            if req_size < 64: req_size = 64
+            if req_size < 16: req_size = 16
         except:
             req_size = 512
 
@@ -173,6 +191,10 @@ def worker_loop():
             base_seed = -1
 
         print(f">> [WORKER] Generating {count} images for {session_id}")
+        preset_key = spec.get('preset', DEFAULT_PRESET).lower().strip()
+        preset_conf = PRESET_CONFIG.get(preset_key, PRESET_CONFIG[DEFAULT_PRESET])
+        
+        print(f">> [WORKER] Using Preset: {preset_key} (Model: {preset_conf['model']}, LoRA: {preset_conf['lora']})")
 
         for i in range(count):
             if session_id not in result_queues:
@@ -192,20 +214,39 @@ def worker_loop():
                 prompt = spec.get('p_prompt', '')
                 neg_prompt = spec.get('n_prompt', '')
                 
+                # [NEW] LoRA Prompt Injection
+                lora_filename = preset_conf['lora']
+                lora_name_only = os.path.splitext(lora_filename)[0]
+                final_prompt = f"<lora:{lora_name_only}:1.0>{prompt}"
+                
                 exe_path_rel = os.path.relpath(SD_EXE_PATH, BASE_DIR)
-                model_path_rel = os.path.relpath(DEFAULT_MODEL_PATH, BASE_DIR)
+                # 모델 파일 경로 (models/cetusMix.safetensors 등)
+                model_full_path = os.path.join(MODEL_DIR, preset_conf['model'])
+                model_path_rel = os.path.relpath(model_full_path, BASE_DIR)
+                
                 output_path_rel = os.path.relpath(output_path, BASE_DIR)
+                
+                # LoRA 디렉토리 경로
+                lora_dir_rel = os.path.relpath(MODEL_DIR, BASE_DIR)
+
+                # Check if model exists
+                if not os.path.exists(model_full_path):
+                    # 모델이 없으면 기본 모델로 Fallback 시도하거나 에러 처리
+                    # 여기서는 에러 메시지 출력 후 진행 (프로세스 실패 유도)
+                    print(f">> [ERROR] Model file missing: {model_full_path}")
 
                 cmd = [
                     exe_path_rel,
                     '-m', model_path_rel,
-                    '-p', prompt,
+                    '--lora-model-dir', lora_dir_rel,
+                    '-p', final_prompt,
                     '-n', neg_prompt,
                     '-W', "512",
                     '-H', "512",
                     '-s', str(current_seed),
                     '-o', output_path_rel,
-                    '--threads', '8'
+                    '--sampling-method', 'euler_a',
+                    '--diffusion-fa'
                 ]
 
                 startupinfo = None
