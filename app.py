@@ -277,8 +277,7 @@ def worker_loop():
                     try:
                         with Image.open(output_path) as img:
                             if img.size != (req_size, req_size):
-                                resample_filter = getattr(Image, 'Resampling', Image).LANCZOS
-                                img_resized = img.resize((req_size, req_size), resample_filter)
+                                img_resized = img.resize((req_size, req_size), Image.NEAREST)
                                 img_resized.save(output_path)
                     except Exception as e:
                         print(f">> [WORKER] Resize Error: {e}")
