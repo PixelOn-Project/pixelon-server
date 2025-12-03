@@ -3,24 +3,82 @@ import ctypes
 import cpuinfo # pip install py-cpuinfo
 import wmi     # pip install wmi
 
-def get_cuda_driver_version():
+def check_cuda_requirements():
     """
-    nvidia-smi 없이 nvcuda.dll을 로드하여 드라이버 버전을 확인합니다.
-    return: (Major, Minor) tuple or None
+    nvcuda.dll을 사용하여 하드웨어 호환성을 검증합니다.
+    
+    조건:
+    1. Compute Capability 7.5 이상 (RTX 20 시리즈 이상, Turing 아키텍처)
+    2. VRAM 4GB 이상
+    
+    Returns:
+        (bool, str): (호환 여부, 메시지)
     """
     try:
+        # 1. nvcuda.dll 로드
         cuda = ctypes.windll.LoadLibrary("nvcuda.dll")
-        version = ctypes.c_int()
-        result = cuda.cuDriverGetVersion(ctypes.byref(version))
         
-        if result == 0: 
-            v = version.value
-            major = v // 1000
-            minor = (v % 1000) // 10
-            return (major, minor)
-    except Exception:
-        pass
-    return None
+        # 2. CUDA 드라이버 초기화 (반드시 필요)
+        # cuInit(0) -> 성공 시 0 반환
+        result = cuda.cuInit(0)
+        if result != 0:
+            return False, "CUDA 드라이버 초기화 실패 (Driver Error Code: {})".format(result)
+
+        # 3. 장치 개수 확인
+        device_count = ctypes.c_int()
+        cuda.cuDeviceGetCount(ctypes.byref(device_count))
+        
+        if device_count.value == 0:
+            return False, "CUDA를 지원하는 GPU가 없습니다."
+
+        # 상수 정의 (CUDA Driver API Enum)
+        CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR = 75
+        CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR = 76
+        
+        # 장치 순회 (여러 GPU가 있을 경우를 대비)
+        for i in range(device_count.value):
+            device = ctypes.c_int()
+            # i번째 장치 핸들 얻기
+            cuda.cuDeviceGet(ctypes.byref(device), i)
+            
+            # --- 아키텍처(CC) 확인 ---
+            cc_major = ctypes.c_int()
+            cc_minor = ctypes.c_int()
+            cuda.cuDeviceGetAttribute(ctypes.byref(cc_major), CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, device)
+            cuda.cuDeviceGetAttribute(ctypes.byref(cc_minor), CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, device)
+            
+            major = cc_major.value
+            minor = cc_minor.value
+            
+            # --- VRAM 확인 ---
+            # cuDeviceTotalMem_v2는 64비트 메모리 주소를 반환 (bytes 단위)
+            mem_bytes = ctypes.c_size_t()
+            try:
+                cuda.cuDeviceTotalMem_v2(ctypes.byref(mem_bytes), device)
+            except AttributeError:
+                # 구형 드라이버 호환성 (v2가 없을 경우)
+                cuda.cuDeviceTotalMem(ctypes.byref(mem_bytes), device)
+            
+            vram_gb = mem_bytes.value / (1024**3)
+            
+            print(f"GPU {i}: CC {major}.{minor}, VRAM {vram_gb:.2f} GB")
+
+            # 검증 로직
+            # 조건 1: CC 7.5 이상 (RTX 2000번대 이상)
+            is_arch_valid = (major > 7) or (major == 7 and minor >= 5)
+            
+            # 조건 2: VRAM 4GB 이상 (오차 감안하여 3.9GB 정도로 여유를 둠)
+            is_vram_valid = vram_gb >= 3.9
+            
+            if is_arch_valid and is_vram_valid:
+                return True, f"설치 가능: GPU {i} (CC {major}.{minor}, VRAM {vram_gb:.2f} GB)"
+
+        return False, "조건을 만족하는 GPU가 없습니다. (최소사양: RTX 20 시리즈 이상, VRAM 4GB 이상)"
+
+    except OSError:
+        return False, "NVIDIA 드라이버가 설치되어 있지 않습니다 (nvcuda.dll 로드 실패)."
+    except Exception as e:
+        return False, f"검증 중 오류 발생: {e}"
 
 def check_system_capabilities():
     """
@@ -39,11 +97,9 @@ def check_system_capabilities():
     }
 
     # 1. CUDA 드라이버 확인
-    cuda_ver = get_cuda_driver_version()
-    if cuda_ver:
-        major, minor = cuda_ver
-        if major >= 11: 
-            result['cuda'] = True
+    cuda_result = check_cuda_requirements()
+    check, msg = cuda_result    
+    result['cuda'] = check
 
     # 2. Vulkan 확인 (WMI)
     try:

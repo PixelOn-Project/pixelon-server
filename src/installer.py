@@ -117,7 +117,7 @@ def register_uninstaller(install_path):
         winreg.SetValueEx(key, "UninstallString", 0, winreg.REG_SZ, f'"{exe_path}"')
         winreg.SetValueEx(key, "InstallLocation", 0, winreg.REG_SZ, install_path)
         winreg.SetValueEx(key, "DisplayIcon", 0, winreg.REG_SZ, icon_path)
-        winreg.SetValueEx(key, "Publisher", 0, winreg.REG_SZ, "Pixelon")
+        winreg.SetValueEx(key, "Publisher", 0, winreg.REG_SZ, "")
         winreg.CloseKey(key)
     except Exception as e:
         print(f"Registry registration failed: {e}")
@@ -128,10 +128,10 @@ def unregister_uninstaller():
     except:
         pass
 
-class PixelonInstaller(ctk.CTk):
+class PixelOnInstaller(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Pixelon Server Setup")
+        self.title("PixelOn Setup")
         self.geometry("500x850")
         self.resizable(False, False)
 
@@ -157,7 +157,7 @@ class PixelonInstaller(ctk.CTk):
             self.init_modify_mode()
 
     def setup_ui(self):
-        title_text = "Pixelon Manager" if self.is_modify_mode else "Pixelon Installer"
+        title_text = "PixelOn Manager" if self.is_modify_mode else "PixelOn Installer"
         ctk.CTkLabel(self, text=title_text, font=("Segoe UI", 28, "bold")).pack(pady=(25, 15))
 
         path_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -337,7 +337,7 @@ class PixelonInstaller(ctk.CTk):
         threading.Thread(target=self.install_process, daemon=True).start()
 
     def start_uninstall(self):
-        if messagebox.askyesno("Uninstall", "Are you sure you want to remove Pixelon Server?"):
+        if messagebox.askyesno("Uninstall", "Are you sure you want to remove PixelOn?"):
             self.toggle_inputs("disabled")
             threading.Thread(target=self.uninstall_process, daemon=True).start()
 
@@ -431,7 +431,7 @@ class PixelonInstaller(ctk.CTk):
             if not self.is_modify_mode:
                 if self.chk_shortcut and self.chk_shortcut.get():
                     launcher_path = os.path.join(target_dir, LAUNCHER_FILENAME)
-                    self.create_shortcut(launcher_path, "Pixelon Server")
+                    self.create_shortcut(launcher_path, "PixelOn")
                 
             register_uninstaller(target_dir)
 
@@ -468,7 +468,7 @@ class PixelonInstaller(ctk.CTk):
             self.update_progress(0.5)
 
             desktop = os.path.join(os.environ['USERPROFILE'], 'Desktop')
-            lnk_path = os.path.join(desktop, "Pixelon Server.lnk")
+            lnk_path = os.path.join(desktop, "PixelOn.lnk")
             if os.path.exists(lnk_path):
                 os.remove(lnk_path)
 
@@ -487,7 +487,7 @@ class PixelonInstaller(ctk.CTk):
             self.show_error(f"Uninstall failed: {e}")
 
     def show_complete_message(self, target_dir, dst_launcher):
-        msg = "Modification Complete." if self.is_modify_mode else "Installation Complete.\nLaunch Pixelon Server now?"
+        msg = "Modification Complete." if self.is_modify_mode else "Installation Complete.\nLaunch PixelOn now?"
         if messagebox.askyesno("Done", msg):
             if os.path.exists(dst_launcher):
                 subprocess.Popen([dst_launcher], cwd=target_dir)
@@ -568,5 +568,5 @@ class PixelonInstaller(ctk.CTk):
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    app = PixelonInstaller()
+    app = PixelOnInstaller()
     app.mainloop()

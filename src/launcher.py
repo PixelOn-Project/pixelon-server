@@ -26,15 +26,15 @@ else:
 # 서버 실행 파일 경로
 if getattr(sys, 'frozen', False):
     # [배포 모드] Launcher와 Server가 같은 폴더에 설치됨
-    SERVER_EXE = os.path.join(BASE_DIR, "PixelonServer.exe")
+    SERVER_EXE = os.path.join(BASE_DIR, "PixelOnServer.exe")
 else:
     # [개발 모드]
-    SERVER_EXE = os.path.join(BASE_DIR, '..', 'dist', 'PixelonServer', 'PixelonServer.exe')
+    SERVER_EXE = os.path.join(BASE_DIR, '..', 'dist', 'PixelOnServer', 'PixelOnServer.exe')
 
 # 아이콘 경로 (리소스 폴더 기준)
 ICON_PATH = os.path.join(RESOURCE_DIR, "icon.ico") 
 
-class PixelonTrayApp:
+class PixelOnTrayApp:
     def __init__(self):
         self.server_process = None
         self.log_window = None
@@ -103,7 +103,7 @@ class PixelonTrayApp:
             item('Exit', self.quit_app)
         )
 
-        self.icon = pystray.Icon("Pixelon", image, "Pixelon Server", menu)
+        self.icon = pystray.Icon("PixelOn", image, "PixelOn Server", menu)
 
     def open_web(self):
         webbrowser.open("http://127.0.0.1:5000")
@@ -131,7 +131,7 @@ class PixelonTrayApp:
 class LogWindow(ctk.CTkToplevel):
     def __init__(self, process):
         super().__init__()
-        self.title("Pixelon Server Logs")
+        self.title("PixelOn Server Logs")
         self.geometry("600x400")
         
         self.textbox = ctk.CTkTextbox(self, width=580, height=380)
@@ -170,5 +170,5 @@ class LogWindow(ctk.CTkToplevel):
             pass
 
 if __name__ == "__main__":
-    app = PixelonTrayApp()
+    app = PixelOnTrayApp()
     app.run()

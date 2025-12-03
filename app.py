@@ -14,7 +14,7 @@ import webbrowser  # 브라우저 자동 실행용
 from flask import Flask, request, jsonify, Response, stream_with_context, send_from_directory
 from flask_cors import CORS
 from threading import Lock
-from PIL import Image
+from PIL import Image, ImageEnhance
 
 # ========================================================
 # [Config] 경로 및 설정
@@ -276,9 +276,26 @@ def worker_loop():
                 if process.returncode == 0 and os.path.exists(output_path):
                     try:
                         with Image.open(output_path) as img:
+                            enhancer = ImageEnhance.Color(img)
+                            img = enhancer.enhance(1.3) # 채도 1.3배 증가
+                            
+                            enhancer = ImageEnhance.Contrast(img)
+                            img = enhancer.enhance(1.1) # 대비 1.1배 증가
+
+                            def clamp(value, min_value, max_value):
+                                return max(min_value, min(value, max_value))
+                            # 이미지 색상 양자화
+                            img = img.quantize(colors=(clamp(req_size//2, 4, 48)), method=1)
+
+                            # 요청한 이미지 크기에 맞게 리사이즈
                             if img.size != (req_size, req_size):
-                                img_resized = img.resize((req_size, req_size), Image.NEAREST)
-                                img_resized.save(output_path)
+                                # Nearest-Neighbor 보간법 사용
+                                resample_filter = getattr(Image, 'Resampling', Image).NEAREST
+                                img = img.resize((req_size, req_size), resample_filter)
+
+                            # 저장 후, Post Processing 종료
+                            img_final = img.convert("RGB")
+                            img_final.save(output_path)
                     except Exception as e:
                         print(f">> [WORKER] Resize Error: {e}")
 
