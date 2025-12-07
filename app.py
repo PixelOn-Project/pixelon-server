@@ -272,7 +272,7 @@ def worker_loop():
                     current_job['process'] = process
 
                 stdout, _ = process.communicate()
-
+                print(stdout)
                 if process.returncode == 0 and os.path.exists(output_path):
                     try:
                         with Image.open(output_path) as img:
