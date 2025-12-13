@@ -28,7 +28,8 @@ MODELS = {
     "cetusMix.safetensors": "https://civitai.com/api/download/models/105924?type=Model&format=SafeTensor&size=pruned&fp=fp16", 
     "QteaMix.safetensors": "https://civitai.com/api/download/models/94654?type=Model&format=SafeTensor&size=pruned&fp=fp16",
     "PX64NOCAP.safetensors": "https://drive.google.com/uc?export=download&id=1UZYLjoX2NHkL6w5-NJl9kUIoRdD2I11Y",
-    "PixelWorld.safetensors": "https://drive.google.com/uc?export=download&id=1q_zrFaUBmAHuHT2Sg-0sAQeyfrmY2Bg_"
+    "PixelWorld.safetensors": "https://drive.google.com/uc?export=download&id=1q_zrFaUBmAHuHT2Sg-0sAQeyfrmY2Bg_",
+    "PixelArtRedmond15V.safetensors": "https://huggingface.co/artificialguybr/pixelartredmond-1-5v-pixel-art-loras-for-sd-1-5/resolve/main/PixelArtRedmond15V-PixelArt-PIXARFK.safetensors?download=true"
 }
 
 

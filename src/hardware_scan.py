@@ -106,7 +106,7 @@ def check_system_capabilities():
         w = wmi.WMI()
         for gpu in w.Win32_VideoController():
             name = gpu.Name.lower()
-            if any(vendor in name for vendor in ['nvidia', 'amd', 'radeon', 'arc', 'geforce']):
+            if any(vendor in name for vendor in ['nvidia', 'amd', 'radeon', 'arc', 'geforce', 'intel']):
                 result['vulkan'] = True
     except:
         pass

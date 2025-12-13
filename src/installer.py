@@ -4,7 +4,6 @@ import threading
 import requests
 import zipfile
 import shutil
-import ctypes
 import winshell
 import winreg
 from win32com.client import Dispatch
@@ -56,14 +55,21 @@ FILE_REGISTRY = {
     "cetusMix.safetensors": "https://civitai.com/api/download/models/105924?type=Model&format=SafeTensor&size=pruned&fp=fp16", 
     "QteaMix.safetensors": "https://civitai.com/api/download/models/94654?type=Model&format=SafeTensor&size=pruned&fp=fp16",
     "PX64NOCAP.safetensors": "https://drive.google.com/uc?export=download&id=1UZYLjoX2NHkL6w5-NJl9kUIoRdD2I11Y",
-    "PixelWorld.safetensors": "https://drive.google.com/uc?export=download&id=1q_zrFaUBmAHuHT2Sg-0sAQeyfrmY2Bg_"
+    "PixelWorld.safetensors": "https://drive.google.com/uc?export=download&id=1q_zrFaUBmAHuHT2Sg-0sAQeyfrmY2Bg_",
+    "PixelArtRedmond15V.safetensors": "https://huggingface.co/artificialguybr/pixelartredmond-1-5v-pixel-art-loras-for-sd-1-5/resolve/main/PixelArtRedmond15V-PixelArt-PIXARFK.safetensors?download=true"
 }
 
 PRESET_OPTIONS = {
-    "Normal Style (Default)": {
-        "id": "normal",
-        "files": ["cetusMix.safetensors", "PX64NOCAP.safetensors"],
+    "Default": {
+        "id": "default",
+        "files": ["cetusMix.safetensors", "PixelArtRedmond15V.safetensors"],
         "default": True,
+        "description": "Standard Pixel Art Style"
+    },
+    "Character": {
+        "id": "character",
+        "files": ["cetusMix.safetensors", "PX64NOCAP.safetensors"],
+        "default": False,
         "description": "Standard Pixel Art Style"
     },
     "SD Character Style": {
@@ -256,8 +262,18 @@ class PixelOnInstaller(ctk.CTk):
 
         ctk.CTkLabel(main_frame, text="Style Presets", font=("Segoe UI", 16, "bold")).pack(pady=(25, 5))
         
-        self.preset_frame = ctk.CTkFrame(main_frame, fg_color=("gray90", "gray17"), corner_radius=10)
-        self.preset_frame.pack(fill="x", padx=20, pady=10)
+        # preset 증가로 인한 스크롤바 처리
+        #self.preset_frame = ctk.CTkFrame(main_frame, fg_color=("gray90", "gray17"), corner_radius=10)
+        #self.preset_frame.pack(fill="x", padx=20, pady=10)
+
+        # [수정 후] CTkScrollableFrame으로 변경 및 height 지정
+        self.preset_frame = ctk.CTkScrollableFrame(
+            main_frame, 
+            fg_color=("gray90", "gray17"), 
+            corner_radius=10,
+            height=200  # 높이를 지정해야 내용이 많아질 때 스크롤이 생깁니다.
+        )
+        self.preset_frame.pack(fill="x", padx=20, pady=10) # fill="both", expand=True를 쓰면 남은 공간을 채웁니다.
 
         for name, info in PRESET_OPTIONS.items():
             is_checked = info.get("default", False)
@@ -268,7 +284,7 @@ class PixelOnInstaller(ctk.CTk):
             chk = ctk.CTkCheckBox(self.preset_frame, text=display_text, variable=var, font=("Segoe UI", 13))
             chk.pack(anchor="w", padx=15, pady=10)
             
-            if info.get("id") == "normal":
+            if info.get("id") == "default":
                 chk.configure(state="disabled")
             
             self.preset_checkboxes.append({"name": name, "id": info['id'], "widget": chk})
@@ -296,9 +312,9 @@ class PixelOnInstaller(ctk.CTk):
             if all_exist:
                 chk.select()
                 chk.configure(state="disabled", text=f"{item['name']} (Installed)")
-                self.preset_vars[item['name']].set(False) 
+                self.preset_vars[item['name']].set(True) 
             else:
-                if preset_info['id'] == "normal":
+                if preset_info['id'] == "default":
                      self.preset_vars[item['name']].set(True) 
                      chk.configure(state="disabled")
 
@@ -322,7 +338,7 @@ class PixelOnInstaller(ctk.CTk):
         for item in self.preset_checkboxes:
             if self.is_modify_mode and "(Installed)" in item['widget'].cget("text"):
                 continue
-            if PRESET_OPTIONS[item['name']]['id'] == "normal":
+            if PRESET_OPTIONS[item['name']]['id'] == "default":
                 continue
             item['widget'].configure(state=state)
 
@@ -497,7 +513,7 @@ class PixelOnInstaller(ctk.CTk):
 
     def show_error(self, error_msg):
         self.after(0, lambda: messagebox.showerror("Error", f"Operation Failed:\n{error_msg}"))
-        self.after(0, lambda: self.toggle_inputs("normal"))
+        self.after(0, lambda: self.toggle_inputs("default"))
         self.update_status("Failed.")
 
     def download_file(self, url, dest, start_prog, end_prog):

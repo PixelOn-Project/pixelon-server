@@ -42,21 +42,33 @@ HEARTBEAT_TIMEOUT = 5  # 5초 동안 신호 없으면 종료
 STARTUP_GRACE_PERIOD = 30 # 서버 시작 후 30초간은 종료 안 함
 
 PRESET_CONFIG = {
-    "normal": {
+    "default": {
         "model": "cetusMix.safetensors",
-        "lora": "PX64NOCAP.safetensors"
+        "lora": "PX64NOCAP.safetensors",
+        "solt": "N",
+        "negative solt": "EasyNegative"
+    },
+    "character": {
+        "model": "cetusMix.safetensors",
+        "lora": "PixelArtRedmond15V.safetensors",
+        "solt": "B, pixel art, PixArFK",
+        "negative solt": "garish, amateur"
     },
     "sd character": {
         "model": "QteaMix.safetensors",
-        "lora": "PX64NOCAP.safetensors"
+        "lora": "PX64NOCAP.safetensors",
+        "solt": "N",
+        "negative solt": ""
     },
     "background": {
         "model": "cetusMix.safetensors",
-        "lora": "PixelWorld.safetensors"
+        "lora": "PixelWorld.safetensors",
+        "solt": "Fpixel world, ",
+        "negative solt": ""
     }
 }
 # Default Fallback
-DEFAULT_PRESET = "normal"
+DEFAULT_PRESET = "default"
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = secrets.token_hex(16)
@@ -233,8 +245,17 @@ def worker_loop():
                 # [NEW] LoRA Prompt Injection
                 lora_filename = preset_conf['lora']
                 lora_name_only = os.path.splitext(lora_filename)[0]
-                final_prompt = f"<lora:{lora_name_only}:1.0>{prompt}"
-                
+
+                # [New] Optimal Prompt..?
+                front_solt = preset_conf['solt'][1:] if preset_conf['solt'][0] == "F" else ""
+                end_solt = preset_conf['solt'][1:] if preset_conf['solt'][0] == "B" else ""
+                final_prompt = f"<lora:{lora_name_only}:1.0>{front_solt}{prompt}{end_solt}"
+                if len(preset_conf['negative solt']) > 0:
+                    if len(neg_prompt) > 0:
+                        neg_prompt = ', '.join(preset_conf['negative solt'], neg_prompt)
+                    else:
+                        neg_prompt = preset_conf['negative solt']
+
                 exe_path_rel = os.path.relpath(SD_EXE_PATH, BASE_DIR)
                 # 모델 파일 경로 (models/cetusMix.safetensors 등)
                 model_full_path = os.path.join(MODEL_DIR, preset_conf['model'])
@@ -401,8 +422,8 @@ def generate_image():
         def generate_stream():
             try:
                 count = int(spec.get('count', 1))
-                timeout_sec = 300 * count
-                start_time = time.time()
+                #timeout_sec = 300 * count
+                #start_time = time.time()
 
                 while True:
                     try:
