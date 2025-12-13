@@ -163,7 +163,7 @@ Open the Detail window for more precise work. Detailed descriptions of each comp
 PixelOn uses multiple **tags** to compose prompts. After entering text, press the **Enter key** to register a tag. The entered tags are internally connected and used for image generation.
 
 <p align="center">
-    <img src="imgs/9.png" alt="Simple Prompt UI" style="max-width:30%;">
+    <img src="imgs/9.png" alt="Simple Prompt UI">
 </p>
 
 ### 2. Effective Prompt Writing

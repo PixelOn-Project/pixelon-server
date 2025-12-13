@@ -163,7 +163,7 @@ PixelOn을 실행하면 Piskel 에디터 화면이 나타납니다. 기존 Piske
 PixelOn에서는 여러 개의 **태그**로 프롬프트를 구성합니다. 텍스트 입력 후 **Enter 키**를 눌러 태그를 등록할 수 있고, 입력된 태그들은 내부적으로 연결되어 이미지 생성에 사용됩니다.
 
 <p align="center">
-    <img src="imgs/9.png" alt="Simple Prompt UI" style="max-width:30%;">
+    <img src="imgs/9.png" alt="Simple Prompt UI">
 </p>
 
 ### 2. 효과적인 프롬프트 작성법
