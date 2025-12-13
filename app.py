@@ -45,25 +45,25 @@ PRESET_CONFIG = {
     "default": {
         "model": "cetusMix.safetensors",
         "lora": "PixelArtRedmond15V.safetensors",
-        "solt": "B, pixel art, PixArFK",
+        "p_solt": "B, pixel art, PixArFK",
         "negative solt": "garish, amateur"
     },
     "character": {
         "model": "cetusMix.safetensors",
         "lora": "PX64NOCAP.safetensors",
-        "solt": "N",
+        "p_solt": "N",
         "negative solt": "EasyNegative"
     },
     "sd character": {
         "model": "QteaMix.safetensors",
         "lora": "PX64NOCAP.safetensors",
-        "solt": "N",
+        "p_solt": "N",
         "negative solt": ""
     },
     "background": {
         "model": "cetusMix.safetensors",
         "lora": "PixelWorld.safetensors",
-        "solt": "Fpixel world, ",
+        "p_solt": "Fpixel world, ",
         "negative solt": ""
     }
 }
@@ -236,11 +236,10 @@ def worker_loop():
 
             if base_seed == -1:
                 current_seed = random.randint(0, 4294967295)
+                
             else:
                 current_seed = base_seed + i
-
-            # seed update
-            spec['seed'] = current_seed
+            
             try:
                 output_filename = f"{session_id}_{i}.png"
                 output_path = os.path.join(RESULT_DIR, output_filename)
@@ -249,18 +248,54 @@ def worker_loop():
                 neg_prompt = spec.get('n_prompt', '')
                 
                 # [NEW] LoRA Prompt Injection
-                lora_filename = preset_conf['lora']
-                lora_name_only = os.path.splitext(lora_filename)[0]
+                prompt = spec.get('p_prompt', '')
+                neg_prompt = spec.get('n_prompt', '')
+                
+                # 1. LoRA 이름 추출 (설정에 lora가 없을 경우 대비)
+                lora_filename = preset_conf.get('lora', '')
+                lora_tag = ""
+                if lora_filename:
+                    lora_name_only = os.path.splitext(lora_filename)[0]
+                    lora_tag = f"<lora:{lora_name_only}:1.0>"
 
-                # [New] Optimal Prompt..?
-                front_solt = preset_conf['solt'][1:] if preset_conf['solt'][0] == "F" else ""
-                end_solt = preset_conf['solt'][1:] if preset_conf['solt'][0] == "B" else ""
-                final_prompt = f"<lora:{lora_name_only}:1.0>{front_solt}{prompt}{end_solt}"
-                if len(preset_conf['negative solt']) > 0:
-                    if len(neg_prompt) > 0:
-                        neg_prompt = ', '.join(preset_conf['negative solt'], neg_prompt)
+                # 2. Positive Solt 처리 (F: 앞, B: 뒤, None/Empty 처리)
+                p_solt = preset_conf.get('solt', '') # 키가 없으면 빈 문자열
+                if p_solt is None: p_solt = ""       # 값이 None일 경우 빈 문자열로 변환
+
+                final_prompt = lora_tag
+
+                # F/B 식별자가 있고 길이가 충분한 경우
+                if len(p_solt) > 1 and p_solt[0].upper() in ['F', 'B']:
+                    direction = p_solt[0].upper() # F 또는 B
+                    content = p_solt[1:]          # 식별자 제외 나머지
+
+                    if direction == 'F':
+                        # Front: [LoRA] + [Solt] + [User]
+                        final_prompt += f"{content}{prompt}"
                     else:
-                        neg_prompt = preset_conf['negative solt']
+                        # Back: [LoRA] + [User] + [Solt]
+                        final_prompt += f"{prompt}{content}"
+                else:
+                    # Solt가 없거나, F/B 규칙이 없는 경우 (그냥 뒤에 붙이거나 무시)
+                    if p_solt:
+                        final_prompt += f"{prompt}, {p_solt}"
+                    else:
+                        final_prompt += prompt
+
+                # 3. Negative Solt 처리 (항상 맨 앞, None/Empty 처리)
+                n_solt = preset_conf.get('negative solt', '')
+                if n_solt is None: n_solt = ""
+
+                final_neg_prompt = ""
+
+                if n_solt:
+                    if len(neg_prompt) > 0:
+                        # [Solt], [User]
+                        final_neg_prompt = f"{n_solt}, {neg_prompt}"
+                    else:
+                        final_neg_prompt = n_solt
+                else:
+                    final_neg_prompt = neg_prompt
 
                 exe_path_rel = os.path.relpath(SD_EXE_PATH, BASE_DIR)
                 # 모델 파일 경로 (models/cetusMix.safetensors 등)
@@ -283,7 +318,7 @@ def worker_loop():
                     '-m', model_path_rel,
                     '--lora-model-dir', lora_dir_rel,
                     '-p', final_prompt,
-                    '-n', neg_prompt,
+                    '-n', final_neg_prompt,
                     '-W', "512",
                     '-H', "512",
                     '-s', str(current_seed),
@@ -343,6 +378,7 @@ def worker_loop():
                     with open(output_path, "rb") as image_file:
                         b64_string = base64.b64encode(image_file.read()).decode('utf-8')
                     
+                    spec['seed'] = current_seed  # 업데이트된 시드 반영
                     payload = {
                         "type": "image",
                         "status": "generating",

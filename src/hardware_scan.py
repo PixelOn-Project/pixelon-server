@@ -80,6 +80,47 @@ def check_cuda_requirements():
     except Exception as e:
         return False, f"검증 중 오류 발생: {e}"
 
+def check_romc_requirements():
+    """
+    AMD ROMc 호환성 검증 (WMI 기반)
+    """
+    try:
+        w = wmi.WMI()
+        supported_arch = [
+            # GFX906
+            'radeon vii', 'mi50', 
+            # GFX1030 (RDNA2 High-end)
+            'rx 6800', 'rx 6900', 'rx 6950',
+            # GFX1100, 1101, 1102 (RDNA3)
+            'rx 7900', 'rx 7800', 'rx 7700', 'rx 7600',
+            # Future/Integrated (GFX1150/1151 - Ryzen 8000/9000 AI series might be supported later, but stick to dGPU for now)
+        ]
+        
+        for gpu in w.Win32_VideoController():
+            name = gpu.Name.lower()
+            # 1. AMD 제조사 확인
+            if 'amd' in name or 'radeon' in name:
+                # 2. VRAM 확인 (4GB 이상 권장)
+                vram_gb = 0
+                try:
+                    vram_gb = int(gpu.AdapterRAM) / (1024**3)
+                except:
+                    pass # VRAM 정보를 못 가져오는 경우 패스
+                
+                # 3. 아키텍처 매칭
+                # 단순 포함 여부 확인 (엄격한 GFX ID 확인은 복잡하므로 모델명 매칭 사용)
+                is_supported = any(arch in name for arch in supported_arch)
+                
+                if is_supported and vram_gb >= 3.9:
+                    return True, f"설치 가능: {gpu.Name} (VRAM {vram_gb:.2f} GB)"
+                elif is_supported:
+                     return True, f"아키텍처 호환 (VRAM 부족 주의): {gpu.Name}"
+                     
+        return False, "지원되는 AMD GPU를 찾을 수 없습니다. (RX 6000/7000 시리즈 또는 Radeon VII 필요)"
+    
+    except Exception as e:
+        return False, f"AMD 검증 중 오류: {e}"
+
 def check_system_capabilities():
     """
     시스템의 AI 구동 능력을 점수화하여 반환합니다.
@@ -89,6 +130,7 @@ def check_system_capabilities():
     
     result = {
         'cuda': False,
+        'romc': False,
         'vulkan': False,
         'cpu_avx': False,
         'cpu_avx2': False,
@@ -100,6 +142,12 @@ def check_system_capabilities():
     cuda_result = check_cuda_requirements()
     check, msg = cuda_result    
     result['cuda'] = check
+
+    # [삽입] 1.5 AMD ROMc 확인
+    romc_check, romc_msg = check_romc_requirements()
+    result['romc'] = romc_check
+    if romc_check:
+        print(f">> [SCAN] AMD ROMc Compatible: {romc_msg}")
 
     # 2. Vulkan 확인 (WMI)
     try:
