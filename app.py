@@ -408,10 +408,11 @@ def generate_image():
                     try:
                         msg = msg_queue.get(timeout=1.0)
                     except queue.Empty:
-                        if time.time() - start_time > timeout_sec:
-                            err_data = json.dumps({"type": "error", "message": "Timeout"})
-                            yield f"data: {err_data}\n\n"
-                            break
+                        # time out 로직 제거
+                        # if time.time() - start_time > timeout_sec:
+                        #     err_data = json.dumps({"type": "error", "message": "Timeout"})
+                        #     yield f"data: {err_data}\n\n"
+                        #     break
                         continue
                     yield f"data: {json.dumps(msg)}\n\n"
                     if msg.get("type") == "done" or msg.get("status") == "cancelled":
