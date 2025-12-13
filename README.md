@@ -11,7 +11,7 @@ This allows users to create pixel art using AI image generation easily and quick
 
 Boost your expressiveness!
 
-We used Stable Diffusion C++ to implement lightweight and fast image generation. Combined with Piskel, it provides a seamless creative experience. Also, to enrich children's imagination, generated images can be utilized like a coloring book through the 'Export to Layer' feature.
+We used Stable Diffusion C++ to implement lightweight and fast image generation (**4-5 seconds on NVIDIA RTX 3070**). Combined with Piskel, it provides a seamless creative experience.
 
 This project was designed and developed to allow anyone to use Generative AI on their own computer as GPU adoption in households increases, moving away from cloud-based generators that require continuous subscription fees.
 
@@ -35,9 +35,8 @@ This project was designed and developed to allow anyone to use Generative AI on 
 * [Stable Diffusion C++](https://github.com/leejet/stable-diffusion.cpp)
 * [Piskel](https://www.piskelapp.com/)
     * [PixelOn Piskel Repository](URL_HERE)
-* **Stable Diffusion Models**
-    * [LORA Model](URL_HERE)
-    * Other utilized models
+* **Stable Diffusion 1.5 Models & LoRAs**
+    * For information about the AI models and LoRAs used, please refer to the [AI Models Used](#3-ai-models-used) section below.
 
 ---
 
@@ -155,6 +154,92 @@ Open the Detail window for more precise work. Detailed descriptions of each comp
 </table>
 
 <br>
+
+---
+
+## Usage Tips
+
+### 1. Prompt Tag Input
+PixelOn uses multiple **tags** to compose prompts. After entering text, press the **Enter key** to register a tag. The entered tags are internally connected and used for image generation.
+
+<p align="center">
+    <img src="imgs/9.png" alt="Simple Prompt UI" style="max-width:30%;">
+</p>
+
+### 2. Effective Prompt Writing
+
+#### Prompt Writing Tips
+
+* **Don't make it too complex**: Each tag should be written as a noun or adjective + noun, preferably within 3-4 words.
+* **Set appropriate resolution:** Resolutions smaller than 64x64 make it difficult to express details.
+  * For General, Character, SD Character models, 64x64 is recommended.
+  * For Background models, 128x128 is recommended.
+* **Try multiple times:** AI generation is probabilistic, so the same prompt can produce different results each time.
+* **Tag order matters:** Tags positioned earlier have a greater influence on image generation.
+* **Use Negative Prompts:** Specifying unwanted elements (e.g., garish, amateur) improves quality.
+
+#### Prompt Examples
+
+<table>
+<tr>
+<td width="50%" align="center">
+    <img src="imgs/11.png" alt="Example 1" style="max-width:70%;">
+    <p>
+    Preset: General<br>
+    Resolution: 64x64<br>
+    Positive Prompt: <code>cat</code> <code>fluffy fur</code> <code>sitting on grass</code><br>
+    Negative Prompt: -<br>
+    </p>
+</td>
+<td width="50%" align="center">
+    <img src="imgs/10.png" alt="Example 2" style="max-width:70%;">
+    <p>
+    Preset: Character<br>
+    Resolution: 64x64<br>
+    Positive Prompt: <code>girl</code> <code>long hair</code> <code>blonde hair</code> <code>pretty face</code> <code>smiling</code><br>
+    Negative Prompt: -<br>
+    </p>
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+    <img src="imgs/12.png" alt="Example 3" style="max-width:70%;">
+    <p>
+    Preset: SD Character<br>
+    Resolution: 64x64<br>
+    Positive Prompt: <code>girl</code> <code>twin tails</code> <code>red and white dress</code> <code>cute pose</code><br>
+    Negative Prompt: -<br>
+    </p>
+</td>
+<td width="50%" align="center">
+    <img src="imgs/13.png" alt="Example 4" style="max-width:70%;">
+    <p>
+    Preset: Background<br>
+    Resolution: 128x128<br>
+    Positive Prompt: <code>mountain landscape</code> <code>snow peaks</code> <code>clear sky</code> <code>pine trees</code> <code>sunrise</code><br>
+    Negative Prompt: -<br>
+    </p>
+</td>
+</tr>
+</table>
+
+### 3. AI Models Used
+
+PixelOn utilizes the following open-source AI models:
+
+* **Base Model (Stable Diffusion 1.5):** [Cetus-Mix](https://civitai.com/models/6755?modelVersionId=48569), [QteaMix](https://civitai.com/models/50696/qteamix-q?modelVersionId=94654)
+* **LoRA:** [8bitdiffuser 64x](https://civitai.com/models/185743/8bitdiffuser-64x-or-a-perfect-pixel-art-model), [pixel world](https://civitai.com/models/115889/pixel-world), [pixelartredmond-1-5v-pixel-art-loras-for-sd-1-5](https://huggingface.co/artificialguybr/pixelartredmond-1-5v-pixel-art-loras-for-sd-1-5)
+
+> Each model follows its respective license. Please check each model's license for commercial use.
+
+Each preset uses the following model combinations:
+
+* **General**: Cetus-Mix base + pixelartredmond-1-5v-pixel-art-loras-for-sd-1-5 LoRA
+* **Character**: Cetus-Mix base + 8bitdiffuser 64x LoRA
+* **SD Character**: QteaMix base + 8bitdiffuser 64x LoRA
+* **Background**: Cetus-Mix base + pixel world LoRA
+
+---
 
 ## Development Environment
 
