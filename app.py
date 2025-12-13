@@ -39,7 +39,7 @@ SERVER_URL = f"http://{HOST}:{PORT}"
 
 # 자동 종료 설정 (초 단위)
 HEARTBEAT_TIMEOUT = 5  # 5초 동안 신호 없으면 종료
-STARTUP_GRACE_PERIOD = 30 # 서버 시작 후 10초간은 종료 안 함
+STARTUP_GRACE_PERIOD = 30 # 서버 시작 후 30초간은 종료 안 함
 
 PRESET_CONFIG = {
     "normal": {
@@ -194,13 +194,15 @@ def worker_loop():
             #color_qunt: int, (n <= 0: auto)
             #seed: int(n == -1: auto)
             color_qunt = int(spec.get('color_qunt', -1))
-            if color_qunt == -1:
+            if color_qunt < 0:
                 color_qunt = clamp(req_size//2, 4, 48)
         except:
             color_qunt = clamp(req_size//2, 4, 48)
 
         try:
             base_seed = int(spec.get('seed', -1))
+            if base_seed < 0:
+                base_seed = -1
         except:
             base_seed = -1
 
