@@ -39,20 +39,20 @@ SERVER_URL = f"http://{HOST}:{PORT}"
 
 # 자동 종료 설정 (초 단위)
 HEARTBEAT_TIMEOUT = 5  # 5초 동안 신호 없으면 종료
-STARTUP_GRACE_PERIOD = 30 # 서버 시작 후 30초간은 종료 안 함
+STARTUP_GRACE_PERIOD = 10 # 서버 시작 후 10초간은 종료 안 함
 
 PRESET_CONFIG = {
     "default": {
         "model": "cetusMix.safetensors",
-        "lora": "PX64NOCAP.safetensors",
-        "solt": "N",
-        "negative solt": "EasyNegative"
-    },
-    "character": {
-        "model": "cetusMix.safetensors",
         "lora": "PixelArtRedmond15V.safetensors",
         "solt": "B, pixel art, PixArFK",
         "negative solt": "garish, amateur"
+    },
+    "character": {
+        "model": "cetusMix.safetensors",
+        "lora": "PX64NOCAP.safetensors",
+        "solt": "N",
+        "negative solt": "EasyNegative"
     },
     "sd character": {
         "model": "QteaMix.safetensors",
@@ -160,6 +160,9 @@ def shutdown_monitor():
 # ========================================================
 # [Worker] 백그라운드 작업 처리자
 # ========================================================
+def clamp(value, min_value, max_value):
+    return max(min_value, min(value, max_value))
+
 def worker_loop():
     print(">> [SYSTEM] Worker thread started.")
     while True:
@@ -205,6 +208,7 @@ def worker_loop():
         try: 
             #color_qunt: int, (n <= 0: auto)
             #seed: int(n == -1: auto)
+            
             color_qunt = int(spec.get('color_qunt', -1))
             if color_qunt < 0:
                 color_qunt = clamp(req_size//2, 4, 48)
@@ -235,6 +239,8 @@ def worker_loop():
             else:
                 current_seed = base_seed + i
 
+            # seed update
+            spec['seed'] = current_seed
             try:
                 output_filename = f"{session_id}_{i}.png"
                 output_path = os.path.join(RESULT_DIR, output_filename)
@@ -319,9 +325,6 @@ def worker_loop():
                             enhancer = ImageEnhance.Contrast(img)
                             img = enhancer.enhance(1.1) # 대비 1.1배 증가
 
-                            def clamp(value, min_value, max_value):
-                                return max(min_value, min(value, max_value))
-                            
                             # 이미지 색상 양자화
                             img = img.quantize(colors=color_qunt, method=1)
 
