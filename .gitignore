@@ -1,0 +1,17 @@
+# build files
+static
+venv
+dist
+build
+
+# Binaries
+bin/
+*.dll
+*.exe
+models
+
+# Temp files
+__pycache__
+results/*
+test_output
+*.spec

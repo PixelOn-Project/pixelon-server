@@ -1,0 +1,4 @@
+[submodule "piskel"]
+	path = piskel
+	url = https://github.com/PixelOn-Project/piskel.git
+	branch = dev

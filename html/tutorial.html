@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelOn Tutorial</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #2c3e50;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --sidebar-width: 260px;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: var(--bg-color);
+        }
+        
+        /* Language Toggle Container */
+        .lang-switch {
+            display: flex;              /* Flexbox 적용 */
+            justify-content: flex-end;  /* 우측 정렬 */
+            gap: 8px;                   /* 버튼 사이 간격 일정하게 유지 */
+            
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Individual Buttons */
+        .lang-btn {
+            width: 80px;
+            height: 34px;
+            box-sizing: border-box;    
+            
+            display: flex;
+            justify-content: center;  
+            align-items: center;        
+            padding: 0;                 
+            background: #fff;           
+            border: 1px solid #ddd;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #555;
+            font-family: inherit;      
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn:hover {
+            background-color: #f1f3f5;
+        }
+
+        .lang-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 600;           
+        }
+
+        /* Sidebar Navigation */
+        nav {
+            width: var(--sidebar-width);
+            background: #fff;
+            height: 100vh;
+            position: fixed;
+            border-right: 1px solid #eee;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        nav h1 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        nav li {
+            margin-bottom: 10px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-size: 0.95rem;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        nav a:hover, nav a.active {
+            background-color: #e7f3ff;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        nav .sub-link {
+            padding-left: 25px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        /* Main Content */
+        main {
+            margin-left: var(--sidebar-width);
+            padding: 40px 60px;
+            width: 100%;
+            max-width: 1000px;
+        }
+        section {
+            background: #fff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            margin-bottom: 40px;
+        }
+        h2 {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 12px;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+        h3 {
+            font-size: 1.4rem;
+            color: #444;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Layout Helpers */
+        .usage-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            align-items: flex-start;
+            border-bottom: 1px solid #f1f3f5;
+            padding-bottom: 30px;
+        }
+        .usage-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .usage-img {
+            flex: 1;
+            text-align: center;
+            background: #222;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .usage-text {
+            flex: 1;
+        }
+        .usage-text h4 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            background: #f1f3f5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: block;
+            margin: 0 auto;
+        }
+        .img-container {
+            text-align: center;
+            margin: 25px 0;
+            background: #222;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        p { margin-bottom: 15px; }
+        ul, ol { margin-bottom: 20px; padding-left: 25px; }
+        li { margin-bottom: 8px; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            width: 25%;
+        }
+        
+        code {
+            background: #f1f3f5;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            color: #c7254e;
+            font-size: 0.9em;
+        }
+        .note {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+        .warning {
+            background-color: #fff5f5;
+            border-left: 4px solid #ff6b6b;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+            color: #c0392b;
+            font-weight: bold;
+        }
+        .btn-link {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-link:hover { background-color: #357abd; }
+
+        /* Hide elements based on language */
+        .lang-en { display: none; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #ddd; padding: 15px; }
+            main { margin-left: 0; padding: 20px; }
+            .usage-row { flex-direction: column; }
+            .usage-img { width: 100%; box-sizing: border-box; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="lang-switch">
+            <button class="lang-btn active" onclick="setLang('ko')">한국어</button>
+            <button class="lang-btn" onclick="setLang('en')">English</button>
+        </div>
+
+        <h1>PixelOn Docs</h1>
+        <ul>
+            <li>
+                <a href="#intro">
+                    <span class="lang-ko">1. 소개</span>
+                    <span class="lang-en">1. Introduction</span>
+                </a>
+            </li>
+            <li>
+                <a href="#specs">
+                    <span class="lang-ko">2. 시스템 요구사항</span>
+                    <span class="lang-en">2. Requirements</span>
+                </a>
+            </li>
+            <li>
+                <a href="#install">
+                    <span class="lang-ko">3. 설치</span>
+                    <span class="lang-en">3. Installation</span>
+                </a>
+            </li>
+            <li>
+                <a href="#usage">
+                    <span class="lang-ko">4. 사용법</span>
+                    <span class="lang-en">4. Usage</span>
+                </a>
+                <a href="#usage-editor" class="sub-link">- Editor</a>
+                <a href="#usage-simple" class="sub-link">- Simple Prompt</a>
+                <a href="#usage-detail" class="sub-link">- Detail Dialog</a>
+            </li>
+            <li>
+                <a href="#dev">
+                    <span class="lang-ko">5. 개발 환경</span>
+                    <span class="lang-en">5. Dev Environment</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="intro">
+            <h2>What is PixelOn?</h2>
+            <div class="img-container">
+                <img src="/static/tutorial/imgs/1.png" alt="PixelOn Main">
+            </div>
+            
+            <div class="lang-ko">
+                <p>
+                    <strong>PixelOn</strong>은 PixelArt Editor인 <strong>Piskel</strong>에 <strong>On-Device</strong> 이미지 생성 기능을 추가한 확장 기능입니다.
+                    사용자는 언제 어디서든 쉽고 빠르게 AI 이미지 생성 기능을 활용하여 픽셀 아트를 만들 수 있습니다.
+                </p>
+                <p>
+                    Stable Diffusion C++를 이용해 가볍고 빠른 이미지 생성을 구현하였으며, Piskel과 결합하여 끊임없는 창작 경험을 제공합니다. 
+                    'Layer 내보내기' 기능을 통해 생성된 이미지를 컬러링 북처럼 활용하여 아이들의 상상력을 풍부하게 키워줄 수도 있습니다.
+                </p>
+                <p>
+                    이 프로젝트는 클라우드 구독료 부담 없이 누구나 자신의 컴퓨터(GPU)를 활용해 생성형 AI를 즐길 수 있도록 기획되었습니다.
+                </p>
+                <h3>주요 기능</h3>
+                <ul>
+                    <li><strong>AI 이미지 생성:</strong> 텍스트 프롬프트를 입력해 즉시 도트 이미지 생성</li>
+                    <li><strong>호환성:</strong> 기존 <code>.piskel</code> 파일과 완벽하게 호환</li>
+                    <li><strong>내보내기:</strong> 생성된 결과물을 Editor 레이어로 즉시 적용 가능</li>
+                </ul>
+            </div>
+
+            <div class="lang-en">
+                <p>
+                    <strong>PixelOn</strong> is an extension that adds <strong>On-Device</strong> AI image generation capabilities to <strong>Piskel</strong>, the PixelArt Editor.
+                    Users can easily and quickly create pixel art using AI image generation anywhere, anytime.
+                </p>
+                <p>
+                    We implemented lightweight and fast image generation using Stable Diffusion C++, combined with Piskel to provide a seamless creative experience.
+                    With the 'Export to Layer' feature, generated images can be used like a coloring book to boost children's imagination.
+                </p>
+                <p>
+                    This project was designed to allow anyone to enjoy Generative AI using their own computer (GPU) without the burden of cloud subscription fees.
+                </p>
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>AI Image Generation:</strong> Generate pixel art instantly via text prompts.</li>
+                    <li><strong>Compatibility:</strong> Fully compatible with existing <code>.piskel</code> files.</li>
+                    <li><strong>Export:</strong> Immediately apply generated results as Editor layers.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="specs">
+            <h2>System Requirements</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            <span class="lang-ko">구분</span>
+                            <span class="lang-en">Type</span>
+                        </th>
+                        <th>
+                            <span class="lang-ko">최소 사양</span>
+                            <span class="lang-en">Minimum</span>
+                        </th>
+                        <th>
+                            <span class="lang-ko">권장 사양</span>
+                            <span class="lang-en">Recommended</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>CPU</td>
+                        <td>Intel i5 +</td>
+                        <td>Intel i5 +</td>
+                    </tr>
+                    <tr>
+                        <td>RAM</td>
+                        <td>16GB +</td>
+                        <td>16GB +</td>
+                    </tr>
+                    <tr>
+                        <td>GPU</td>
+                        <td>RTX 2000 Series (4GB+)</td>
+                        <td>RTX 3070 +</td>
+                    </tr>
+                    <tr>
+                        <td>Disk</td>
+                        <td>20GB+ Free</td>
+                        <td>20GB+ Free</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="lang-ko">
+                <div class="note">
+                    <strong>Notice 1:</strong> CPU만으로도 구동 가능하나, 장당 2~3분 이상 소요될 수 있습니다. (RTX 2060 기준 약 10초)
+                </div>
+                <div class="note">
+                    <strong>Notice 2:</strong> AMD GPU 지원은 추후 업데이트 예정입니다.
+                </div>
+            </div>
+
+            <div class="lang-en">
+                <div class="note">
+                    <strong>Notice 1:</strong> CPU-only mode is available but may take 2-3 minutes per image. (Approx. 10s on RTX 2060)
+                </div>
+                <div class="note">
+                    <strong>Notice 2:</strong> AMD GPU support will be updated in the future.
+                </div>
+            </div>
+        </section>
+
+        <section id="install">
+            <h2>How to Install</h2>
+            <div class="img-container">
+                <img src="/static/tutorial/imgs/2.png" alt="Installer">
+            </div>
+
+            <div class="lang-ko">
+                <ol>
+                    <li><a href="#" class="btn-link">PixelOn Installer 다운로드</a>를 클릭하여 파일을 받습니다.</li>
+                    <li>설치 프로그램을 실행하면 시스템을 스캔하여 최적의 가속화 버전(CUDA 등)을 자동 선택합니다.</li>
+                    <li>설치가 완료되면 바탕화면의 <strong>PixelOn</strong>을 실행합니다.</li>
+                </ol>
+                <h3>Q & A</h3>
+                <ul>
+                    <li><strong>Q. NVIDIA GPU인데 CUDA가 선택되지 않습니다.</strong><br>
+                    A. GPU 드라이버 버전이 낮을 수 있습니다. NVIDIA 최신 드라이버로 업데이트해주세요.</li>
+                    <li><strong>Q. 서버 연결 실패 오류가 뜹니다.</strong><br>
+                    A. 설치 중 네트워크 문제로 파일이 누락되었을 수 있습니다. 재설치를 진행해주세요.</li>
+                    <li><strong>Q. 생성 속도가 너무 느립니다.</strong><br>
+                    A. GPU 가속기가 없거나 사양이 낮을 경우 느릴 수 있습니다. 이는 로컬 구동 방식의 물리적 한계입니다.</li>
+                </ul>
+            </div>
+
+            <div class="lang-en">
+                <ol>
+                    <li>Click <a href="#" class="btn-link">Download PixelOn Installer</a> to get the file.</li>
+                    <li>Run the installer. It will automatically scan your system and select the optimal acceleration version (e.g., CUDA).</li>
+                    <li>Once installed, run <strong>PixelOn</strong> from your desktop.</li>
+                </ol>
+                <h3>Q & A</h3>
+                <ul>
+                    <li><strong>Q. I have an NVIDIA GPU but CUDA is not selected.</strong><br>
+                    A. Your GPU driver might be outdated. Please update to the latest NVIDIA drivers.</li>
+                    <li><strong>Q. "Server Connection Failed" error appears.</strong><br>
+                    A. Network issues during installation may have caused missing files. Please reinstall.</li>
+                    <li><strong>Q. Generation speed is too slow.</strong><br>
+                    A. It may be slow if you lack a GPU accelerator or have low specs. This is a physical limitation of local execution.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="usage">
+            <h2>How to Use PixelOn</h2>
+
+            <h3 id="usage-editor">1. Piskel Editor</h3>
+            <div class="lang-ko">
+                <p>
+                    PixelOn을 실행하면 Piskel 에디터 화면이 나타납니다. 기존 Piskel 사용법과 동일하게 도트 작업을 수행할 수 있습니다. 
+                    자세한 사용 방법은 <strong><a href="https://www.piskelapp.com/wiki/help" target="_blank">Piskel 공식 가이드</a></strong>를 참고해주세요.
+                </p>
+            </div>
+            <div class="lang-en">
+                <p>
+                    When you run PixelOn, the Piskel editor screen appears. You can perform pixel art tasks just like the original Piskel.
+                    For details, please refer to the <strong><a href="https://www.piskelapp.com/wiki/help" target="_blank">Piskel Official Guide</a></strong>.
+                </p>
+            </div>
+
+            <h3 id="usage-simple">2. Simple Prompt</h3>
+            <div class="img-container">
+                <img src="/static/tutorial/imgs/3.png" alt="Simple Prompt UI">
+            </div>
+            
+            <div class="lang-ko">
+                <p>
+                    에디터 하단의 프롬프트 창을 이용해 빠르게 이미지를 생성합니다. 
+                    이곳에는 그리고 싶은 내용을 담은 <strong>Positive Prompt(긍정 명령어)</strong>만 입력 가능합니다.
+                </p>
+            </div>
+            <div class="lang-en">
+                <p>
+                    Use the prompt window at the bottom of the editor to quickly generate images.
+                    Only <strong>Positive Prompts</strong> (what you want to draw) can be entered here.
+                </p>
+            </div>
+
+            <h3 id="usage-detail">3. Detail Dialog</h3>
+            <div class="img-container">
+                <img src="/static/tutorial/imgs/4.png" alt="Detail Dialog UI">
+            </div>
+            
+            <div class="lang-ko">
+                <p>더 정교한 작업을 원한다면 Detail 창을 엽니다. 아래에서 각 구성 요소의 기능과 사용법을 확인하세요.</p>
+            </div>
+            <div class="lang-en">
+                <p>Open the Detail window for more precise control. Check the functions and usage below.</p>
+            </div>
+
+            <br>
+
+            <div class="usage-row">
+                <div class="usage-img">
+                    <img src="/static/tutorial/imgs/5.png" alt="History UI">
+                </div>
+                <div class="usage-text">
+                    <h4>ⓐ History Management</h4>
+                    <div class="lang-ko">
+                        <p><b>History</b> 탭에서 이전 작업 세션을 관리합니다.</p>
+                        <ul>
+                            <li><b>세션 클릭:</b> 과거 생성 기록을 조회합니다.</li>
+                            <li><b>... 버튼:</b> 세션 이름을 변경하거나 삭제합니다.</li>
+                        </ul>
+                        <div class="warning">※ 주의: 삭제 시 복구(Undo)가 불가능하므로 신중하게 결정해주세요.</div>
+                    </div>
+                    <div class="lang-en">
+                        <p>Manage previous sessions in the <b>History</b> tab.</p>
+                        <ul>
+                            <li><b>Click Session:</b> View past generation records.</li>
+                            <li><b>... Button:</b> Rename or delete the session.</li>
+                        </ul>
+                        <div class="warning">※ Warning: Deletion cannot be undone. Decide carefully.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="usage-row">
+                <div class="usage-img">
+                    <img src="/static/tutorial/imgs/6.png" alt="Settings UI">
+                </div>
+                <div class="usage-text">
+                    <h4>ⓑ Prompt & Settings</h4>
+                    <div class="lang-ko">
+                        <p>이미지 생성의 핵심 설정을 조작합니다.</p>
+                        <ul>
+                            <li><b>Positive Prompt:</b> 생성할 장면 묘사 (태그 형식, Enter 구분)</li>
+                            <li><b>Negative Prompt:</b> 제외할 요소 작성 (예: 저화질 등)</li>
+                            <li><b>Preset:</b> 상황에 맞는 모델 프리셋 선택 (Normal, Pixel Art 등)</li>
+                            <li><b>Resolution / Count:</b> 이미지 크기와 생성 개수 조절</li>
+                        </ul>
+                        <div class="note">주의: 해상도가 너무 작으면 이미지가 정상적으로 생성되지 않을 수 있습니다.</div>
+                    </div>
+                    <div class="lang-en">
+                        <p>Control key settings for image generation.</p>
+                        <ul>
+                            <li><b>Positive Prompt:</b> Describe scene (Tag format, Enter to separate).</li>
+                            <li><b>Negative Prompt:</b> Elements to exclude (e.g., low quality).</li>
+                            <li><b>Preset:</b> Select model presets (Normal, Pixel Art, etc.).</li>
+                            <li><b>Resolution / Count:</b> Adjust image size and count.</li>
+                        </ul>
+                        <div class="note">Note: If resolution is too small, images may not generate correctly.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="usage-row">
+                <div class="usage-img">
+                    <img src="/static/tutorial/imgs/7.png" alt="Results UI">
+                </div>
+                <div class="usage-text">
+                    <h4>ⓒ Results</h4>
+                    <div class="lang-ko">
+                        <p>생성된 이미지를 확인하고 관리합니다.</p>
+                        <ul>
+                            <li><b>좌클릭:</b> 이미지 선택</li>
+                            <li><b>... 클릭 (이미지 상단):</b>
+                                <ul>
+                                    <li><i>Transfer:</i> 생성 당시 설정 불러오기</li>
+                                    <li><i>Delete:</i> 해당 이미지 삭제</li>
+                                </ul>
+                            </li>
+                            <li><b>Cancel:</b> 이미지 선택 해제</li>
+                            <li><b>Delete Selected:</b> 선택된 이미지 일괄 삭제</li>
+                        </ul>
+                        <div class="warning">※ 주의: 이미지를 삭제하면 복구할 수 없습니다.</div>
+                    </div>
+                    <div class="lang-en">
+                        <p>Check and manage generated images.</p>
+                        <ul>
+                            <li><b>Left Click:</b> Select image.</li>
+                            <li><b>... Click (Top of Image):</b>
+                                <ul>
+                                    <li><i>Transfer:</i> Load settings used for generation.</li>
+                                    <li><i>Delete:</i> Delete this image.</li>
+                                </ul>
+                            </li>
+                            <li><b>Cancel:</b> Deselect image.</li>
+                            <li><b>Delete Selected:</b> Delete all selected images.</li>
+                        </ul>
+                        <div class="warning">※ Warning: Deleted images cannot be recovered.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="usage-row">
+                <div class="usage-img">
+                    <img src="/static/tutorial/imgs/8.png" alt="Log UI">
+                </div>
+                <div class="usage-text">
+                    <h4>ⓓ Log, Expert</h4>
+                    <div class="lang-ko">
+                        <p>작동 로그를 확인하거나 이미지를 Editor로 내보냅니다.</p>
+                        <ul>
+                            <li><b>Move To Frame:</b> 선택된 이미지들을 각각 <b>새로운 프레임</b>으로 내보냅니다. (여러 장 작업 시 유용)</li>
+                            <li><b>Move To Layer:</b> 마지막 선택 이미지를 <b>현재 레이어</b>로 내보냅니다. (한 장 작업 시 유용)</li>
+                        </ul>
+                    </div>
+                    <div class="lang-en">
+                        <p>Check logs or export images to Editor.</p>
+                        <ul>
+                            <li><b>Move To Frame:</b> Export selected images as <b>New Frames</b>. (Useful for multi-image tasks)</li>
+                            <li><b>Move To Layer:</b> Export last selected image to <b>Current Layer</b>. (Useful for single image)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="dev">
+            <h2>Development Environment</h2>
+            <h3>Prerequisites</h3>
+            <ul>
+                <li>Windows OS</li>
+                <li>Python >= 3.10</li>
+                <li>Node.js</li>
+            </ul>
+            <p><em>(Built on Python 3.14 and Node 24.11.1)</em></p>
+
+            <div class="lang-ko">
+                <h3>How to Setup</h3>
+                <ol>
+                    <li>위 조건을 만족하는 환경을 준비합니다.</li>
+                    <li><code>bootstrap.bat</code>을 실행하여 종속성 파일(SD C++, Piskel, Models)을 설치합니다.</li>
+                    <li><code>python app.py</code>를 입력하여 로컬 서버를 실행합니다.</li>
+                </ol>
+                <h3>Contribute</h3>
+                <p>기여를 원하신다면 <code>dev</code> 브랜치를 사용해주세요. Pull Request는 언제나 환영합니다!</p>
+                <h3>License</h3>
+                <p>이 프로젝트는 <a href="#">MIT License</a>를 따릅니다.</p>
+            </div>
+
+            <div class="lang-en">
+                <h3>How to Setup</h3>
+                <ol>
+                    <li>Prepare an environment meeting the above prerequisites.</li>
+                    <li>Run <code>bootstrap.bat</code> to install dependencies (SD C++, Piskel, Models).</li>
+                    <li>Run <code>python app.py</code> to start the local server.</li>
+                </ol>
+                <h3>Contribute</h3>
+                <p>Please use the <code>dev</code> branch if you want to contribute. Pull Requests are always welcome!</p>
+                <h3>License</h3>
+                <p>This project follows the <a href="#">MIT License</a>.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function setLang(lang) {
+            // 1. Toggle Content
+            const koElements = document.querySelectorAll('.lang-ko');
+            const enElements = document.querySelectorAll('.lang-en');
+            
+            if (lang === 'ko') {
+                koElements.forEach(el => el.style.display = 'block');
+                enElements.forEach(el => el.style.display = 'none');
+                document.documentElement.lang = 'ko';
+            } else {
+                koElements.forEach(el => el.style.display = 'none');
+                enElements.forEach(el => el.style.display = 'block');
+                document.documentElement.lang = 'en';
+            }
+
+            // 2. Toggle Buttons
+            const btns = document.querySelectorAll('.lang-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            
+            // Find the button that was clicked (based on text or logic)
+            // Simple approach: standard index or finding by text
+            if(lang === 'ko') btns[0].classList.add('active');
+            else btns[1].classList.add('active');
+        }
+
+        // Initialize (Default to Korean)
+        setLang('ko');
+    </script>
+</body>
+</html>
