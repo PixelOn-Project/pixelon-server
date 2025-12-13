@@ -10,11 +10,13 @@ import uuid
 import glob
 import queue
 import random
-import webbrowser  # 브라우저 자동 실행용
+import webbrowser
 from flask import Flask, request, jsonify, Response, stream_with_context, send_from_directory
 from flask_cors import CORS
+from flask_socketio import SocketIO # [추가] SocketIO 임포트
 from threading import Lock
 from PIL import Image, ImageEnhance
+import secrets
 
 # ========================================================
 # [Config] 경로 및 설정
@@ -57,7 +59,8 @@ PRESET_CONFIG = {
 DEFAULT_PRESET = "normal"
 
 app = Flask(__name__, static_folder='static')
-CORS(app) # CORS 허용 (로컬 파일 접근 문제 해결)
+app.config['SECRET_KEY'] = secrets.token_hex(16)
+CORS(app)
 
 # ========================================================
 # [System] 전역 상태 관리
@@ -76,6 +79,8 @@ result_queues = {}
 # [자동 종료] 마지막 하트비트 시간 기록
 last_heartbeat_time = time.time()
 
+# 소켓 객체 추가
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 # ========================================================
 # [System] 하드웨어 가속 감지
 # ========================================================
@@ -123,15 +128,14 @@ def shutdown_monitor():
     while True:
         time.sleep(1)
         
-        # 시작 직후 유예 기간 (브라우저 켜지는 시간 고려)
+        # 시작 직후 유예 기간
         if time.time() - start_time < STARTUP_GRACE_PERIOD:
             continue
 
-        # 마지막 신호로부터 타임아웃 지났는지 확인
+        # [핵심] last_heartbeat_time이 갱신되지 않거나, 강제로 0이 되면 즉시 종료
         if time.time() - last_heartbeat_time > HEARTBEAT_TIMEOUT:
-            print(">> [SYSTEM] No heartbeat detected. Shutting down server...")
+            print(">> [SYSTEM] Heartbeat timeout or Disconnect detected. Shutting down...")
             
-            # 현재 작업 중인 프로세스가 있다면 정리
             with current_job_lock:
                 if current_job['process']:
                     try:
@@ -139,7 +143,6 @@ def shutdown_monitor():
                     except:
                         pass
             
-            # Flask 서버 강제 종료
             os._exit(0)
 
 # ========================================================
@@ -352,14 +355,27 @@ t = threading.Thread(target=worker_loop, daemon=True)
 t.start()
 
 # ========================================================
-# [API] Heartbeat (생존 신고)
+# [API] Heartbeat (Socket.IO 이벤트로 변경)
 # ========================================================
-@app.route('/api/heartbeat', methods=['POST'])
-def heartbeat():
-    """클라이언트가 1~2초마다 호출해야 함"""
+
+@socketio.on('connect')
+def handle_connect():
     global last_heartbeat_time
-    last_heartbeat_time = time.time() # 시간 갱신
-    return jsonify({"status": "alive"})
+    last_heartbeat_time = time.time()
+    # print(">> [SOCKET] Client connected")
+
+@socketio.on('heartbeat')
+def handle_heartbeat(data):
+    global last_heartbeat_time
+    last_heartbeat_time = time.time()
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    global last_heartbeat_time
+    # [변경] 연결 해제 즉시 타임아웃 로직이 발동하도록 시간을 과거로 강제 설정
+    # (현재 시간 - 타임아웃 - 10초)로 설정하여 즉각적인 종료 유도
+    print(">> [SOCKET] Client disconnected. Triggering shutdown...")
+    last_heartbeat_time = time.time() - HEARTBEAT_TIMEOUT - 10
 
 # ========================================================
 # [API] 기존 API 들
@@ -484,4 +500,4 @@ if __name__ == '__main__':
     threading.Timer(1.5, open_browser).start()
 
     # 3. 서버 시작 (host='127.0.0.1'로 로컬만 허용)
-    app.run(host=HOST, port=PORT, threaded=True)
+    socketio.run(app, host=HOST, port=PORT, debug=False, allow_unsafe_werkzeug=True)
