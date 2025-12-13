@@ -349,8 +349,20 @@ def worker_loop():
                 with current_job_lock:
                     current_job['process'] = process
 
-                stdout, _ = process.communicate()
-                print(stdout)
+                # [수정] 실시간 로그 출력을 위한 루프
+                while True:
+                    # 한 줄씩 읽기
+                    line = process.stdout.readline()
+                    
+                    # 더 이상 읽을 라인이 없고 프로세스가 종료되었으면 탈출
+                    if not line and process.poll() is not None:
+                        break
+                        
+                    if line:
+                        # 콘솔에 즉시 출력 (strip()으로 불필요한 공백 제거)
+                        print(line.strip())
+                        sys.stdout.flush()
+
                 if process.returncode == 0 and os.path.exists(output_path):
                     try:
                         with Image.open(output_path) as img:
