@@ -180,10 +180,21 @@ def worker_loop():
             count = 1
 
         try:
-            req_size = int(spec.get('width', 512))
-            if req_size < 16: req_size = 16
+            req_size_w = max(int(spec.get('width', 512)), 16)
+            req_size_h = max(int(spec.get('height', 512)), 16)
+            req_size = max(req_size_w, req_size_h)
+            if req_size < 16:req_size = 16
         except:
             req_size = 512
+
+        try: 
+            #color_qunt: int, (n <= 0: auto)
+            #seed: int(n == -1: auto)
+            color_qunt = int(spec.get('color_qunt', -1))
+            if color_qunt == -1:
+                color_qunt = clamp(req_size//2, 4, 48)
+        except:
+            color_qunt = clamp(req_size//2, 4, 48)
 
         try:
             base_seed = int(spec.get('seed', -1))
@@ -284,18 +295,19 @@ def worker_loop():
 
                             def clamp(value, min_value, max_value):
                                 return max(min_value, min(value, max_value))
+                            
                             # 이미지 색상 양자화
-                            img = img.quantize(colors=(clamp(req_size//2, 4, 48)), method=1)
+                            img = img.quantize(colors=color_qunt, method=1)
 
                             # 요청한 이미지 크기에 맞게 리사이즈
-                            if img.size != (req_size, req_size):
+                            if img.size != (req_size_w, req_size_h):
                                 # Nearest-Neighbor 보간법 사용
                                 resample_filter = getattr(Image, 'Resampling', Image).NEAREST
-                                img = img.resize((req_size, req_size), resample_filter)
+                                img = img.resize((req_size_w, req_size_h), resample_filter)
 
                             # 저장 후, Post Processing 종료
                             img_final = img.convert("RGB")
-                            img_final.save(output_path)
+                            img_final.save(output_path) 
                     except Exception as e:
                         print(f">> [WORKER] Resize Error: {e}")
 
