@@ -21,27 +21,46 @@
             background-color: var(--bg-color);
         }
         
-        /* Language Toggle */
+        /* Language Toggle Container */
         .lang-switch {
-            text-align: right;
+            display: flex;              /* Flexbox 적용 */
+            justify-content: flex-end;  /* 우측 정렬 */
+            gap: 8px;                   /* 버튼 사이 간격 일정하게 유지 */
+            
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
+
+        /* Individual Buttons */
         .lang-btn {
-            background: none;
+            width: 80px;
+            height: 34px;
+            box-sizing: border-box;    
+            
+            display: flex;
+            justify-content: center;  
+            align-items: center;        
+            padding: 0;                 
+            background: #fff;           
             border: 1px solid #ddd;
-            height: 32px;
-            padding: 5px 10px;
             cursor: pointer;
             border-radius: 4px;
             font-size: 0.85rem;
             color: #555;
+            font-family: inherit;      
+            transition: all 0.2s ease;
         }
+
+        .lang-btn:hover {
+            background-color: #f1f3f5;
+        }
+
         .lang-btn.active {
             background-color: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
+            font-weight: 600;           
         }
 
         /* Sidebar Navigation */
