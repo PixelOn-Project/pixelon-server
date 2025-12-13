@@ -14,6 +14,7 @@ MINOR_VER = "2034588"
 TARGETS = {
     "cuda": f"https://github.com/PixelOn-Project/pixelon-server/releases/download/v0.0/sd_core.zip",
     "vulkan": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-vulkan-x64.zip",
+    "romc": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-romc-x64.zip",
     "cpu_avx512": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-avx512-x64.zip",
     "cpu_avx2": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-avx2-x64.zip",
     "cpu_avx": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-avx-x64.zip",
@@ -127,11 +128,12 @@ def main():
     print("==========================================")
     print("Select target version to install:")
     print("   1. CUDA (NVIDIA GPU)")
-    print("   2. Vulkan (AMD/Intel/NVIDIA GPU)")
+    print("   2. Vulkan (Generic GPU)")
     print("   3. CPU AVX2 (Standard CPU)")
     print("   4. CPU AVX512 (High Performance CPU)")
     print("   5. CPU AVX (Older CPU)")
     print("   6. CPU No-AVX (Legacy CPU)")
+    print("   7. AMD ROMc (RX 6000/7000 Series)") # [추가]
     print("==========================================")
     
     choice = input(">> Enter choice (1-6 or name): ").strip().lower()
@@ -144,6 +146,7 @@ def main():
     elif choice in ['4', 'avx512']: target_mode = 'cpu_avx512'
     elif choice in ['5', 'avx']: target_mode = 'cpu_avx'
     elif choice in ['6', 'noavx']: target_mode = 'cpu_noavx'
+    elif choice in ['7', 'romc', 'amd']: target_mode = 'romc' # [추가]
     else:
         print(f">> [WARN] Invalid input '{choice}'. Defaulting to 'cuda'.")
         target_mode = 'cuda'

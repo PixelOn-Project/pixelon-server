@@ -36,4 +36,4 @@ xcopy /E /Y /I "imgs\*" "static\tutorial\imgs"
 call python -m venv venv
 call ./venv/Scripts/activate
 call pip install -r requirements.txt
-call python ./src/fetch_binaries.py
+call python ./src/fetch_binaries.py 

@@ -11,7 +11,7 @@
 
 여러분들의 표현력을 더 높여보세요!
 
-우리는 Stable Diffusion C++를 이용해 가볍고 빠른 이미지 생성 기능을 구현했습니다. 이를 Piskel과 결합하여 끊임없는 창작 경험을 제공합니다. 또한 아이들의 상상력을 더욱 풍부하게 해주기 위해 'Layer 내보내기' 기능을 통해 생성된 이미지를 컬러링 북처럼 활용할 수도 있습니다.
+저희는 Stable Diffusion C++를 이용해 가볍고 빠른 이미지 생성 기능을 구현했습니다(**NVIDIA RTX 3070 기준 4~5초**). 이를 Piskel과 결합하여 끊임없는 창작 경험을 제공합니다.
 
 이 프로젝트는 컴퓨터 기술의 발전과 가정 내 GPU 보급률 증가에 발맞추어, 지속적인 구독료를 요구하는 클라우드 기반 생성기 대신 누구나 쉽게 자신의 컴퓨터에서 생성형 AI를 활용할 수 있도록 기획 및 개발되었습니다.
 
@@ -35,9 +35,8 @@
 * [Stable Diffusion C++](https://github.com/leejet/stable-diffusion.cpp)
 * [Piskel](https://www.piskelapp.com/)
     * [PixelOn Piskel Repository](URL_HERE)
-* **Stable Diffusion Models**
-    * [LORA Model](URL_HERE)
-    * 그 외 활용된 모델들
+* **Stable Diffusion 1.5 Models & LoRAs**
+    * 사용된 AI 모델 및 LoRA에 대한 정보는 하단의 [사용된 AI 모델 정보](#3-사용된-ai-모델-정보) 섹션을 참고해주세요.
 
 ---
 
@@ -155,6 +154,92 @@ PixelOn을 실행하면 Piskel 에디터 화면이 나타납니다. 기존 Piske
 </table>
 
 <br>
+
+---
+
+## Usage Tips
+
+### 1. 프롬프트 태그 입력
+PixelOn에서는 여러 개의 **태그**로 프롬프트를 구성합니다. 텍스트 입력 후 **Enter 키**를 눌러 태그를 등록할 수 있고, 입력된 태그들은 내부적으로 연결되어 이미지 생성에 사용됩니다.
+
+<p align="center">
+    <img src="imgs/9.png" alt="Simple Prompt UI">
+</p>
+
+### 2. 효과적인 프롬프트 작성법
+
+#### 프롬프트 작성 시 주의사항
+
+* **너무 복잡하게 작성하지 마세요**: 각 태그는 명사 또는 형용사 + 명사 형태로 작성하고, 3~4 단어 이내로 작성하는 것이 좋습니다.
+* **적절한 해상도를 설정하세요:** 64x64 미만의 너무 낮은 해상도는 디테일 표현이 어렵습니다.
+  * General, Character, SD Character 모델의 경우 64x64로 설정하는 게 좋습니다.
+  * Background 모델의 경우 128x128로 설정하는 게 좋습니다.
+* **여러 번 시도하세요:** AI 생성은 확률적이므로, 같은 프롬프트로도 매번 다른 결과가 나올 수 있습니다.
+* **태그 순서가 중요합니다:** 앞쪽에 위치한 태그일수록 이미지 생성에 더 큰 영향을 미칩니다.
+* **Negative Prompt를 활용하세요:** 원하지 않는 요소(ex. garish, amateur)를 명시하면 품질이 향상됩니다.
+
+#### 프롬프트 예시
+
+<table>
+<tr>
+<td width="50%" align="center">
+    <img src="imgs/11.png" alt="예시 1" style="max-width:70%;">
+    <p>
+    Preset: General<br>
+    Resolution: 64x64<br>
+    Positive Prompt: <code>cat</code> <code>fluffy fur</code> <code>sitting on grass</code><br>
+    Negative Prompt: -<br>
+    </p>
+</td>
+<td width="50%" align="center">
+    <img src="imgs/10.png" alt="예시 2" style="max-width:70%;">
+    <p>
+    Preset: Character<br>
+    Resolution: 64x64<br>
+    Positive Prompt: <code>girl</code> <code>long hair</code> <code>blonde hair</code> <code>pretty face</code> <code>smiling</code><br>
+    Negative Prompt: -<br>
+    </p>
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+    <img src="imgs/12.png" alt="예시 3" style="max-width:70%;">
+    <p>
+    Preset: SD Character<br>
+    Resolution: 64x64<br>
+    Positive Prompt: <code>girl</code> <code>twin tails</code> <code>red and white dress</code> <code>cute pose</code><br>
+    Negative Prompt: -<br>
+    </p>
+</td>
+<td width="50%" align="center">
+    <img src="imgs/13.png" alt="예시 4" style="max-width:70%;">
+    <p>
+    Preset: Background<br>
+    Resolution: 128x128<br>
+    Positive Prompt: <code>mountain landscape</code> <code>snow peaks</code> <code>clear sky</code> <code>pine trees</code> <code>sunrise</code><br>
+    Negative Prompt: -<br>
+    </p>
+</td>
+</tr>
+</table>
+
+### 3. 사용된 AI 모델 정보
+
+PixelOn은 다음의 오픈소스 AI 모델을 활용합니다.
+
+* **Base Model(Stable Diffusion 1.5):** [Cetus-Mix](https://civitai.com/models/6755?modelVersionId=48569), [QteaMix](https://civitai.com/models/50696/qteamix-q?modelVersionId=94654)
+* **LoRA:** [8bitdiffuser 64x](https://civitai.com/models/185743/8bitdiffuser-64x-or-a-perfect-pixel-art-model), [pixel world](https://civitai.com/models/115889/pixel-world), [pixelartredmond-1-5v-pixel-art-loras-for-sd-1-5](https://huggingface.co/artificialguybr/pixelartredmond-1-5v-pixel-art-loras-for-sd-1-5)
+
+> 각 모델은 해당 모델의 라이선스를 따릅니다. 상업적 이용 시 각 모델의 라이선스를 반드시 확인해주세요.
+
+Preset 별로 다음의 모델 조합을 사용합니다.
+
+* **General**: Cetus-Mix base + pixelartredmond-1-5v-pixel-art-loras-for-sd-1-5 LoRA
+* **Character**: Cetus-Mix base + 8bitdiffuser 64x LoRA
+* **SD Character**: QteaMix base + 8bitdiffuser 64x LoRA
+* **Background**: Cetus-Mix base + pixel world LoRA
+
+---
 
 ## Development Environment
 

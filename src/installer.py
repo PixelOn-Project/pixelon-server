@@ -41,6 +41,7 @@ SERVER_CORE_URL = "https://github.com/PixelOn-Project/pixelon-server/releases/do
 ENGINE_URLS = {
     "cuda": f"https://github.com/PixelOn-Project/pixelon-server/releases/download/v0.0/sd_core.zip",
     "vulkan": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-vulkan-x64.zip",
+    "romc": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-romc-x64.zip",
     "cpu_avx512": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-avx512-x64.zip",
     "cpu_avx2": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-avx2-x64.zip",
     "cpu_avx": f"https://github.com/leejet/stable-diffusion.cpp/releases/download/{MAJOR_VER}-{MINOR_VER}/sd-master-{MINOR_VER}-bin-win-avx-x64.zip",
@@ -138,7 +139,7 @@ class PixelOnInstaller(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("PixelOn Setup")
-        self.geometry("500x850")
+        self.geometry("500x750")
         self.resizable(False, False)
 
         self.sys_info = check_system_capabilities()
@@ -164,17 +165,17 @@ class PixelOnInstaller(ctk.CTk):
 
     def setup_ui(self):
         title_text = "PixelOn Manager" if self.is_modify_mode else "PixelOn Installer"
-        ctk.CTkLabel(self, text=title_text, font=("Segoe UI", 28, "bold")).pack(pady=(25, 15))
+        ctk.CTkLabel(self, text=title_text, font=("Segoe UI", 28, "bold")).pack(pady=(25, 10))
 
         path_frame = ctk.CTkFrame(self, fg_color="transparent")
-        path_frame.pack(fill="x", padx=30, pady=5)
+        path_frame.pack(fill="x", padx=30, pady=2)
         
-        ctk.CTkLabel(path_frame, text="Install Location:", font=("Segoe UI", 12)).pack(anchor="w", padx=5, pady=(0, 5))
+        ctk.CTkLabel(path_frame, text="Install Location:", font=("Segoe UI", 12)).pack(anchor="w", padx=5, pady=(0, 2))
         
         path_input_frame = ctk.CTkFrame(path_frame, fg_color="transparent")
         path_input_frame.pack(fill="x")
 
-        self.entry_path = ctk.CTkEntry(path_input_frame, height=35)
+        self.entry_path = ctk.CTkEntry(path_input_frame, height=20)
         if self.is_modify_mode:
             self.entry_path.insert(0, self.installed_path)
             self.entry_path.configure(state="disabled")
@@ -183,8 +184,8 @@ class PixelOnInstaller(ctk.CTk):
         self.entry_path.pack(side="left", fill="x", expand=True, padx=(0, 10))
         
         self.btn_browse = ctk.CTkButton(
-            path_input_frame, text="Browse", width=70, height=35, 
-            fg_color="transparent", border_width=2, border_color="#3B8ED0", 
+            path_input_frame, text="Browse", width=70, height=20, 
+            fg_color="transparent", border_width=2, border_color="black", 
             text_color=("gray10", "#DCE4EE"), hover_color=("gray70", "gray30"),
             command=self.browse_folder
         )
@@ -193,7 +194,11 @@ class PixelOnInstaller(ctk.CTk):
             self.btn_browse.configure(state="disabled")
 
         bottom_frame = ctk.CTkFrame(self, fg_color="transparent")
-        bottom_frame.pack(side="bottom", fill="x", padx=30, pady=30)
+        bottom_frame.pack(side="bottom", fill="x", padx=30, pady=2)
+
+        self.current_progress = ctk.CTkProgressBar(bottom_frame, height=12, corner_radius=6)
+        self.current_progress.pack(side="bottom", fill="x", pady=(5, 5))
+        self.current_progress.set(0)
 
         self.progress = ctk.CTkProgressBar(bottom_frame, height=12, corner_radius=6)
         self.progress.pack(side="bottom", fill="x", pady=(5, 0))
@@ -205,12 +210,12 @@ class PixelOnInstaller(ctk.CTk):
         if not self.is_modify_mode:
             self.chk_shortcut = ctk.CTkCheckBox(bottom_frame, text="Create Desktop Shortcut", onvalue=True, offvalue=False)
             self.chk_shortcut.select()
-            self.chk_shortcut.pack(side="bottom", anchor="w", pady=(0, 5))
+            self.chk_shortcut.pack(side="bottom", anchor="w", pady=(2, 2))
         else:
             self.chk_shortcut = None
 
-        btn_font = ("Segoe UI", 16, "bold")
-        btn_height = 55 
+        btn_font = ("Segoe UI", 12, "bold")
+        btn_height = 35 
 
         if self.is_modify_mode:
             self.btn_uninstall = ctk.CTkButton(
@@ -218,26 +223,26 @@ class PixelOnInstaller(ctk.CTk):
                 height=btn_height, corner_radius=12, font=btn_font,
                 fg_color="#C0392B", hover_color="#922B21"
             )
-            self.btn_uninstall.pack(side="bottom", fill="x", pady=(5, 0)) 
+            self.btn_uninstall.pack(side="bottom", fill="x", pady=(2, 0)) 
             
             self.btn_install = ctk.CTkButton(
                 bottom_frame, text="UPDATE / MODIFY", command=self.start_install, 
                 height=btn_height, corner_radius=12, font=btn_font,
                 fg_color="#1F6AA5", hover_color="#144870"
             )
-            self.btn_install.pack(side="bottom", fill="x", pady=(10, 5))
+            self.btn_install.pack(side="bottom", fill="x", pady=(2, 5))
         else:
             self.btn_install = ctk.CTkButton(
                 bottom_frame, text="INSTALL NOW", command=self.start_install, 
                 height=btn_height, corner_radius=12, font=btn_font,
                 fg_color="#2CC985", hover_color="#229966"
             )
-            self.btn_install.pack(side="bottom", fill="x", pady=(5, 0))
+            self.btn_install.pack(side="bottom", fill="x", pady=(2, 0))
 
         main_frame = ctk.CTkFrame(self, fg_color=("gray85", "gray20"), corner_radius=20)
-        main_frame.pack(side="top", fill="both", expand=True, padx=30, pady=20)
+        main_frame.pack(side="top", fill="both", expand=True, padx=30, pady=10)
 
-        ctk.CTkLabel(main_frame, text="AI Engine (Backend)", font=("Segoe UI", 16, "bold")).pack(pady=(20, 5))
+        ctk.CTkLabel(main_frame, text="AI Engine (Backend)", font=("Segoe UI", 16, "bold")).pack(pady=(5, 0))
         
         rec = self.sys_info['recommended']
         info_text = f"Auto-Detected: {rec.upper()} is Optimal"
@@ -247,33 +252,35 @@ class PixelOnInstaller(ctk.CTk):
             info_text = "Standard CPU mode selected."
             msg_color = "#F1C40F"
             
-        ctk.CTkLabel(main_frame, text=info_text, text_color=msg_color, font=("Segoe UI", 13)).pack(pady=(0, 10))
+        ctk.CTkLabel(main_frame, text=info_text, text_color=msg_color, font=("Segoe UI", 13)).pack(pady=(1, 2))
         
         radio_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
         radio_frame.pack(anchor="w", padx=20)
 
         self.rb_cuda = ctk.CTkRadioButton(radio_frame, text="GPU: NVIDIA CUDA 12+", variable=self.selected_option, value="cuda")
+        self.rb_romc = ctk.CTkRadioButton(radio_frame, text="GPU: AMD ROMc 2.0+", variable=self.selected_option, value="romc")
         self.rb_vulkan = ctk.CTkRadioButton(radio_frame, text="GPU: Vulkan", variable=self.selected_option, value="vulkan")
         self.rb_cpu = ctk.CTkRadioButton(radio_frame, text="CPU (Auto-Detect)", variable=self.selected_option, value="cpu")
 
-        self.rb_cuda.pack(anchor="w", pady=4)
-        self.rb_vulkan.pack(anchor="w", pady=4)
-        self.rb_cpu.pack(anchor="w", pady=4)
+        self.rb_cuda.pack(anchor="w", pady=2)
+        self.rb_romc.pack(anchor="w", pady=2)
+        self.rb_vulkan.pack(anchor="w", pady=2)
+        self.rb_cpu.pack(anchor="w", pady=2)
 
-        ctk.CTkLabel(main_frame, text="Style Presets", font=("Segoe UI", 16, "bold")).pack(pady=(25, 5))
+        ctk.CTkLabel(main_frame, text="Style Presets", font=("Segoe UI", 16, "bold")).pack(pady=(10, 5))
         
         # preset 증가로 인한 스크롤바 처리
         #self.preset_frame = ctk.CTkFrame(main_frame, fg_color=("gray90", "gray17"), corner_radius=10)
         #self.preset_frame.pack(fill="x", padx=20, pady=10)
 
         # [수정 후] CTkScrollableFrame으로 변경 및 height 지정
-        self.preset_frame = ctk.CTkScrollableFrame(
+        self.preset_frame = ctk.CTkFrame(
             main_frame, 
             fg_color=("gray90", "gray17"), 
             corner_radius=10,
             height=200  # 높이를 지정해야 내용이 많아질 때 스크롤이 생깁니다.
         )
-        self.preset_frame.pack(fill="x", padx=20, pady=10) # fill="both", expand=True를 쓰면 남은 공간을 채웁니다.
+        self.preset_frame.pack(fill="x", padx=20, pady=5) # fill="both", expand=True를 쓰면 남은 공간을 채웁니다.
 
         for name, info in PRESET_OPTIONS.items():
             is_checked = info.get("default", False)
@@ -293,6 +300,7 @@ class PixelOnInstaller(ctk.CTk):
 
     def update_option_states(self):
         if not self.sys_info['cuda']: self.rb_cuda.configure(state="disabled")
+        if not self.sys_info.get('romc', False): self.rb_romc.configure(state="disabled")
         if not self.sys_info['vulkan'] and not self.sys_info['cuda']:
              self.rb_vulkan.configure(text="GPU: Vulkan (Not detected)")
 
@@ -549,7 +557,11 @@ class PixelOnInstaller(ctk.CTk):
                         if total_length > 0:
                             file_progress = downloaded / total_length
                             overall_progress = start_prog + (file_progress * (end_prog - start_prog))
+                            # 전체 업데이트 진행률
                             self.update_progress(overall_progress)
+                            
+                            # [FIX] Update current progress
+                            self.after(0, lambda: self.current_progress.set(file_progress))
         except Exception as e:
             raise Exception(f"Download failed: {url}\n{str(e)}")
 
