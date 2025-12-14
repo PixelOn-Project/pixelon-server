@@ -2,6 +2,7 @@
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
 [![kr](https://img.shields.io/badge/lang-kr-blue.svg)](README.kr.md)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/PixelOn-Project/pixelon-server)](https://github.com/PixelOn-Project/pixelon-server/releases/latest)
 
 ## What is PixelOn?
 ![PixelOn Main](imgs/1.png)
@@ -34,7 +35,7 @@
 ### Open Source Credits
 * [Stable Diffusion C++](https://github.com/leejet/stable-diffusion.cpp)
 * [Piskel](https://www.piskelapp.com/)
-    * [PixelOn Piskel Repository](URL_HERE)
+    * [PixelOn Piskel Repository](https://github.com/PixelOn-Project/piskel)
 * **Stable Diffusion 1.5 Models & LoRAs**
     * 사용된 AI 모델 및 LoRA에 대한 정보는 하단의 [사용된 AI 모델 정보](#3-사용된-ai-모델-정보) 섹션을 참고해주세요.
 
@@ -42,17 +43,22 @@
 
 ## How to install Piskel & PixelOn?
 ![PixelOn Installer](imgs/2.png)
-1. **[PixelOn Installer 다운로드](URL_HERE)**를 클릭하여 설치 파일을 받습니다.
+1. **[PixelOn Installer 다운로드](https://github.com/PixelOn-Project/pixelon-server/releases/latest/)**를 클릭하여 설치 파일을 받습니다.
 2. 설치 프로그램을 실행하면 시스템을 자동으로 스캔하여 최적의 가속화 버전(CUDA 등)을 선택합니다.
 3. 설치가 완료되면 바탕화면의 **PixelOn**을 실행합니다.
 
 ### Q & A
-* **Q. Nvidia GPU인데 CUDA가 선택되지 않습니다.**
-    * A. GPU 드라이버 버전이 낮을 수 있습니다. [Nvidia 드라이버 다운로드](https://www.nvidia.com/Download/index.aspx)에서 최신 버전으로 업데이트해주세요.
+* **Q. Nvidia GPU를 사용 중인데 CUDA가 선택되지 않습니다.**
+    * A. GPU 드라이버 버전이 낮을 수 있습니다. **[Nvidia 드라이버 다운로드](https://www.nvidia.com/Download/index.aspx)**에서 최신 버전으로 업데이트해주세요.
+* **Q. AMD GPU를 사용 중인데 ROCm이 선택되지 않거나, 실행시 오류가 발생합니다.**
+    * A. GPU 드라이버 버전이 낮을 수 있습니다. **[AMD 드라이버 다운로드](hhttps://www.amd.com/en/support/download/drivers.html)**에서 최신 버전으로 업데이트해주세요.
+    * A. 현재 개발 팀의 테스트 환경 제약으로 인해 ROCm(AMD) 동작이 완벽하게 검증되지 않았습니다. 문제 발생 시 이슈를 남겨주시면 감사하겠습니다.
 * **Q. 서버 연결에 실패했다고 나옵니다.**
     * A. 네트워크 이슈로 설치 과정에서 누락된 파일이 있을 수 있습니다. 설치 프로그램을 통해 다시 설치해주세요.
 * **Q. 생성 속도가 너무 느립니다.**
     * A. GPU 가속기가 없거나 사양을 충족하지 못할 경우 속도가 느릴 수 있습니다. 이는 로컬 구동 방식의 물리적 한계입니다.
+* **Q. 제거는 어떻게 하나요?**
+    * A. 설치 파일인 `PixelOn Installer.exe`를 다시 실행하거나, Windows `설정>앱>설치된 앱`에서 `PixelOn`을 검색해 삭제할 수 있습니다.
 
 ---
 
@@ -245,8 +251,8 @@ Preset 별로 다음의 모델 조합을 사용합니다.
 
 ### Prerequisites
 * Windows OS
-* Python >= 3.10
-* Node.js
+* [Python](https://www.python.org/downloads/) >= 3.10
+* [Node.js](https://nodejs.org/ko/download)
 *(We build on Python 3.14 and Node 24.11.1)*
 
 ### How to setup

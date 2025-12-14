@@ -92,7 +92,7 @@ result_queues = {}
 last_heartbeat_time = time.time()
 
 # 소켓 객체 추가
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins=[], async_mode='threading')
 # ========================================================
 # [System] 하드웨어 가속 감지
 # ========================================================
@@ -575,4 +575,4 @@ if __name__ == '__main__':
     threading.Timer(1.5, open_browser).start()
 
     # 3. 서버 시작 (host='127.0.0.1'로 로컬만 허용)
-    socketio.run(app, host=HOST, port=PORT, debug=False)
+    socketio.run(app, host=HOST, port=PORT, debug=False, allow_unsafe_werkzeug=True)

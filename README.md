@@ -2,6 +2,7 @@
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
 [![kr](https://img.shields.io/badge/lang-kr-blue.svg)](README.kr.md)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/PixelOn-Project/pixelon-server)](https://github.com/PixelOn-Project/pixelon-server/releases/latest)
 
 ## What is PixelOn?
 ![PixelOn Main](imgs/1.png)
@@ -34,7 +35,7 @@ This project was designed and developed to allow anyone to use Generative AI on 
 ### Open Source Credits
 * [Stable Diffusion C++](https://github.com/leejet/stable-diffusion.cpp)
 * [Piskel](https://www.piskelapp.com/)
-    * [PixelOn Piskel Repository](URL_HERE)
+    * [PixelOn Piskel Repository](https://github.com/PixelOn-Project/piskel)
 * **Stable Diffusion 1.5 Models & LoRAs**
     * For information about the AI models and LoRAs used, please refer to the [AI Models Used](#3-ai-models-used) section below.
 
@@ -42,18 +43,22 @@ This project was designed and developed to allow anyone to use Generative AI on 
 
 ## How to install Piskel & PixelOn?
 ![PixelOn Installer](imgs/2.png)
-1. Click **[Download PixelOn Installer](URL_HERE)** to get the installation file.
+1. Click **[Download PixelOn Installer](https://github.com/PixelOn-Project/pixelon-server/releases/latest/)** to get the installation file.
 2. Run the installer to automatically scan your system and select the optimal acceleration version (CUDA, etc.).
 3. Once installation is complete, run **PixelOn** from your desktop.
 
 ### Q & A
 * **Q. I have an Nvidia GPU but CUDA is not selected.**
-    * A. Your GPU driver might be outdated. Please update to the latest version at [Nvidia Driver Download](https://www.nvidia.com/Download/index.aspx).
+    * A. Your GPU driver might be outdated. Please update to the latest version at **[Nvidia Driver Download](https://www.nvidia.com/Download/index.aspx)**.
+* **Q. I have an AMD GPU, but ROCm is not selected or errors occur during execution.**
+    * A. Your GPU driver might be outdated. Please update to the latest version at **[AMD Drivers Support](hhttps://www.amd.com/en/support/download/drivers.html)**.
+    * A. Additionally, ROCm support is currently **experimental** due to limited testing environments. Please let us know if you encounter any issues!
 * **Q. It says "Server Connection Failed".**
     * A. There may be missing files due to network issues during installation. Please reinstall via the installer.
 * **Q. Generation speed is too slow.**
     * A. Speed can be slow if you don't have a GPU accelerator or meet the specs. This is a physical limitation of local execution.
-
+* **Q. How do I uninstall PixelOn?**
+    * A. You can uninstall it by running PixelOn Installer.exe again, or by searching for PixelOn in Windows `Settings > Apps > Installed apps`.
 ---
 
 ## How to Use PixelOn?
@@ -245,8 +250,8 @@ Each preset uses the following model combinations:
 
 ### Prerequisites
 * Windows OS
-* Python >= 3.10
-* Node.js
+* [Python](https://www.python.org/downloads/) >= 3.10
+* [Node.js](https://nodejs.org/ko/download)
 *(We build on Python 3.14 and Node 24.11.1)*
 
 ### How to setup
