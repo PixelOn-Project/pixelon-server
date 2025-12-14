@@ -71,7 +71,7 @@ if exist "dist\build.zip" (
 echo.
 echo [STEP 5/5] Building Pixelon Installer...
 
-pyinstaller --noconsole --onefile --uac-admin --name "PixelOnSetup" ^
+pyinstaller --noconsole --onefile --uac-admin --name "PixelOnInstaller" ^
     --collect-all "customtkinter" ^
     --hidden-import "winshell" ^
     --hidden-import "win32com" ^
