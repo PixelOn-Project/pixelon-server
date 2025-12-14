@@ -52,6 +52,7 @@ This project was designed and developed to allow anyone to use Generative AI on 
     * A. Your GPU driver might be outdated. Please update to the latest version at **[Nvidia Driver Download](https://www.nvidia.com/Download/index.aspx)**.
 * **Q. I have an AMD GPU, but ROCm is not selected or errors occur during execution.**
     * A. Your GPU driver might be outdated. Please update to the latest version at **[AMD Drivers Support](hhttps://www.amd.com/en/support/download/drivers.html)**.
+    * A. Additionally, ROCm support is currently **experimental** due to limited testing environments. Please let us know if you encounter any issues!
 * **Q. It says "Server Connection Failed".**
     * A. There may be missing files due to network issues during installation. Please reinstall via the installer.
 * **Q. Generation speed is too slow.**
