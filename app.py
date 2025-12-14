@@ -72,7 +72,7 @@ DEFAULT_PRESET = "default"
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = secrets.token_hex(16)
-CORS(app)
+#CORS(app)
 
 # ========================================================
 # [System] 전역 상태 관리
@@ -575,4 +575,4 @@ if __name__ == '__main__':
     threading.Timer(1.5, open_browser).start()
 
     # 3. 서버 시작 (host='127.0.0.1'로 로컬만 허용)
-    socketio.run(app, host=HOST, port=PORT, debug=False, allow_unsafe_werkzeug=True)
+    socketio.run(app, host=HOST, port=PORT, debug=False)
