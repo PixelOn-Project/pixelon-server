@@ -92,6 +92,10 @@ result_queues = {}
 last_heartbeat_time = time.time()
 
 # 소켓 객체 추가
+# [app.py 상단 전역 변수 부분에 추가]
+connected_clients = 0
+client_count_lock = Lock() # 클라이언트 수 관리를 위한 Lock
+
 socketio = SocketIO(app, cors_allowed_origins=[], async_mode='threading')
 # ========================================================
 # [System] 하드웨어 가속 감지
@@ -133,7 +137,8 @@ clean_results_dir()
 # [System] 자동 종료 모니터링 스레드
 # ========================================================
 def shutdown_monitor():
-    """클라이언트 연결이 끊기면 서버를 종료하는 감시자"""
+    """클라이언트 연결이 없으면 서버를 종료하는 감시자"""
+    global last_heartbeat_time
     print(">> [SYSTEM] Shutdown monitor started.")
     start_time = time.time()
     
@@ -144,9 +149,14 @@ def shutdown_monitor():
         if time.time() - start_time < STARTUP_GRACE_PERIOD:
             continue
 
-        # [핵심] last_heartbeat_time이 갱신되지 않거나, 강제로 0이 되면 즉시 종료
+        # [수정] 연결된 클라이언트가 있으면 타임아웃 시간을 계속 현재로 갱신 (죽지 않음)
+        with client_count_lock:
+            if connected_clients > 0:
+                last_heartbeat_time = time.time()
+
+        # 연결된 클라이언트가 0명인 상태로 HEARTBEAT_TIMEOUT이 지나면 종료
         if time.time() - last_heartbeat_time > HEARTBEAT_TIMEOUT:
-            print(">> [SYSTEM] Heartbeat timeout or Disconnect detected. Shutting down...")
+            print(f">> [SYSTEM] No active clients for {HEARTBEAT_TIMEOUT}s. Shutting down...")
             
             with current_job_lock:
                 if current_job['process']:
@@ -434,22 +444,31 @@ t.start()
 
 @socketio.on('connect')
 def handle_connect():
-    global last_heartbeat_time
+    global connected_clients, last_heartbeat_time
+    with client_count_lock:
+        connected_clients += 1
+    # 연결 즉시 생존 시간 갱신
     last_heartbeat_time = time.time()
-    # print(">> [SOCKET] Client connected")
+    print(f">> [SOCKET] Client connected. Total: {connected_clients}")
 
+@socketio.on('disconnect')
+def handle_disconnect():
+    global connected_clients, last_heartbeat_time
+    with client_count_lock:
+        if connected_clients > 0:
+            connected_clients -= 1
+    
+    print(f">> [SOCKET] Client disconnected. Total: {connected_clients}")
+    
+    # 마지막 사용자가 나갔을 때만 타임아웃 카운트다운 시작
+    # (여기서 시간을 조작하지 않고, monitor 스레드가 last_heartbeat_time과 현재 시간을 비교하게 둠)
+    if connected_clients == 0:
+        last_heartbeat_time = time.time()
+        
 @socketio.on('heartbeat')
 def handle_heartbeat(data):
     global last_heartbeat_time
     last_heartbeat_time = time.time()
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    global last_heartbeat_time
-    # [변경] 연결 해제 즉시 타임아웃 로직이 발동하도록 시간을 과거로 강제 설정
-    # (현재 시간 - 타임아웃 - 10초)로 설정하여 즉각적인 종료 유도
-    print(">> [SOCKET] Client disconnected. Triggering shutdown...")
-    last_heartbeat_time = time.time() - HEARTBEAT_TIMEOUT - 10
 
 # ========================================================
 # [API] 기존 API 들
