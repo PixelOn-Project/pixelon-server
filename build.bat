@@ -42,8 +42,11 @@ echo.
 echo [STEP 3/5] Building Pixelon Launcher...
 pyinstaller --noconsole --onefile --name "PixelOnLauncher" ^
     --add-data "icon.ico;." ^
+    --add-data "src/start.png;." ^
     --collect-all "customtkinter" ^
-    --collect-all "pystray" ^
+    --hidden-import "pystray" ^
+    --hidden-import "engineio" ^
+    --hidden-import "socketio" ^
     --icon "icon.ico" ^
     "src/launcher.py"
 

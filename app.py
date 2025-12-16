@@ -591,7 +591,8 @@ if __name__ == '__main__':
     monitor_thread.start() 
 
     # 2. 브라우저 자동 실행 (1.5초 지연)
-    threading.Timer(1.5, open_browser).start()
+    if not getattr(sys, 'frozen', False):
+        threading.Timer(1.5, open_browser).start()
 
     # 3. 서버 시작 (host='127.0.0.1'로 로컬만 허용)
     socketio.run(app, host=HOST, port=PORT, debug=False, allow_unsafe_werkzeug=True)
